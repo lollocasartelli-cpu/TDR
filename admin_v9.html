@@ -1263,6 +1263,7 @@ function renderStandings() {
             </div>
           </td>
           <td class="left"><div class="st-team">
+            <div class="st-badge" style="background:${teamColor(t.name)}">${teamInitials(t.name)}</div>
             ${teamLogoHtml(t.name, 28, "st-badge-logo")}
             <span class="st-name">${t.name}</span>
           </div></td>
@@ -1325,6 +1326,7 @@ function renderScorers() {
   root.innerHTML = sorted.map((s,i) => `
     <div class="scorer-row">
       <span class="scorer-pos ${posClass(i)}">${i+1}</span>
+      <div class="scorer-badge" style="background:${teamColor(s.team)}">${teamInitials(s.team)}</div>
       ${teamLogoHtml(s.team, 28, "scorer-badge-logo")}
       <div class="scorer-info">
         <div class="scorer-name">${escHtml(s.name)}</div>
@@ -1394,6 +1396,7 @@ function renderBracket() {
     if (isWinner) cls.push('winner');
     if (isLoser)  cls.push('loser');
     return `<div class="${cls.join(' ')}">
+      <div class="bk-slot-badge" style="background:${has?teamColor(team):'#444'}">${teamInitials(team||'')}</div>
       ${has ? teamLogoHtml(team, 32, "bk-slot-badge-logo") : '<div class="bk-slot-badge" style="background:#444">?</div>'}
       <span class="bk-slot-name">${has?escHtml(team):'Da definire'}</span>
       ${penScore!==null&&penScore!==undefined?`<span class="bk-slot-pen">(${penScore})</span>`:''}
