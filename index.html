@@ -536,6 +536,7 @@ function renderStandings() {
             <span class="${qualDotClass(i)}"></span>
           </div></td>
           <td class="left"><div class="st-team">
+            ${teamLogoHtml(t.name, 22)}
             <div class="st-info">
               <div class="st-name js-fit" data-max-fs="13" data-min-fs="8">${t.name}</div>
               ${sp ? `<div class="st-sponsor js-fit" data-max-fs="11" data-min-fs="6">(${escHtml(sp.name)})</div>` : ''}
@@ -590,6 +591,7 @@ function renderScorers() {
   root.innerHTML = sorted.map((s,i) => `
     <div class="scorer-row">
       <span class="scorer-pos">${i+1}</span>
+      ${teamLogoHtml(s.team, 30)}
       <div class="scorer-info">
         <div class="scorer-name">${escHtml(s.name)}</div>
         <div class="scorer-team">${s.team}</div>
@@ -656,6 +658,7 @@ function renderBracket() {
     if (isWinner) cls.push('winner');
     if (isLoser)  cls.push('loser');
     return `<div class="${cls.join(' ')}">
+      ${teamLogoHtml(team||'', 22)}
       <div class="bk-slot-info">
         <span class="bk-slot-name">${has ? escHtml(team) : 'Da definire'}</span>
         ${sp ? `<span class="bk-slot-sponsor">${escHtml(sp.name)}</span>` : ''}
@@ -805,6 +808,7 @@ function buildGironeBlock(m) {
       <div class="match-time-badge"><span class="match-time-text">🕐 ${m.time}</span></div>
       <span class="match-chevron">›</span>
       <div class="team-side" style="${SPONSORS[m.home]?'align-items:flex-start':'align-items:center'}">
+        ${teamLogoHtml(m.home, 28)}
         <div class="team-info">
           <span class="team-name js-fit" data-max-fs="13" data-min-fs="8">${m.home}</span>
           ${sponsorTagHtml(m.home)}
@@ -812,6 +816,7 @@ function buildGironeBlock(m) {
       </div>
       <div class="score-box">${scoreHtml}</div>
       <div class="team-side right" style="${SPONSORS[m.away]?'align-items:flex-start':'align-items:center'}">
+        ${teamLogoHtml(m.away, 28)}
         <div class="team-info" style="align-items:flex-end">
           <span class="team-name js-fit" data-max-fs="13" data-min-fs="8">${m.away}</span>
           ${sponsorTagHtml(m.away)}
@@ -847,6 +852,7 @@ function buildKnockoutBlock(slot) {
       </div>
       <span class="match-chevron">›</span>
       <div class="team-side" style="${bm.home&&SPONSORS[bm.home]?'align-items:flex-start':'align-items:center'}">
+        ${teamLogoHtml(bm.home||'', 28)}
         <div class="team-info">
           <span class="team-name js-fit" data-max-fs="13" data-min-fs="8" style="${!bm.home?'color:var(--text-dim)':''}">${escHtml(homeName)}</span>
           ${bm.home ? sponsorTagHtml(bm.home) : ''}
@@ -854,6 +860,7 @@ function buildKnockoutBlock(slot) {
       </div>
       <div class="score-box">${scoreHtml}</div>
       <div class="team-side right" style="${bm.away&&SPONSORS[bm.away]?'align-items:flex-start':'align-items:center'}">
+        ${teamLogoHtml(bm.away||'', 28)}
         <div class="team-info" style="align-items:flex-end">
           <span class="team-name js-fit" data-max-fs="13" data-min-fs="8" style="${!bm.away?'color:var(--text-dim)':''}">${escHtml(awayName)}</span>
           ${bm.away ? sponsorTagHtml(bm.away) : ''}
@@ -869,16 +876,10 @@ function buildKnockoutBlock(slot) {
 function buildTeamHeader(team) {
   const sp  = team ? SPONSORS[team] : null;
   const src = team ? TEAM_LOGOS[team] : null;
-  // Riga sponsor sempre renderizzata (invisibile se assente) per allineare i marcatori sotto
+  // Riga sponsor sempre presente (invisibile se assente) → i marcatori si allineano orizzontalmente
   const spRow = sp
-    ? `<div class="modal-th-row">
-        <img class="modal-th-sp-logo" src="${sp.logo}" alt="${escHtml(sp.name)}" onerror="this.style.visibility='hidden'">
-        <span class="modal-th-sp-name js-fit" data-max-fs="13" data-min-fs="8">${escHtml(sp.name)}</span>
-       </div>`
-    : `<div class="modal-th-row" style="visibility:hidden">
-        <div style="width:28px;height:28px;flex-shrink:0"></div>
-        <span class="modal-th-sp-name">&nbsp;</span>
-       </div>`;
+    ? `<span class="modal-th-sp-name js-fit" data-max-fs="13" data-min-fs="8">(${escHtml(sp.name)})</span>`
+    : `<span class="modal-th-sp-name" style="visibility:hidden">&nbsp;</span>`;
   return `<div class="modal-team-header">
     <div class="modal-th-row">
       ${src ? `<img class="modal-th-team-logo" src="${src}" alt="${escHtml(team)}" onerror="this.style.visibility='hidden'">` : `<div style="width:36px;height:36px;flex-shrink:0"></div>`}
