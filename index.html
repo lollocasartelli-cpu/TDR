@@ -625,70 +625,85 @@ function renderSponsors() {
 }
 
 // ═══════════════════════════════════════
-//  STATO FASI — gerarchia di sblocco
+//  STATO FASI
 // ═══════════════════════════════════════
-// Ritorna true solo se TUTTI i match della lista sono isFinal===true
-function allClosed(list) {
-  return list.length > 0 && list.every(m => m.isFinal === true);
-}
-
-// Gironi: 15 partite tutte con isFinal===true
 function gironiChiusi() {
-  return matches.length >= 15 && allClosed(matches);
+  return matches.length >= 15 && matches.every(m => m.isFinal === true);
 }
 
-// Quarti: QFA e QFB entrambi isFinal===true su Firebase
-function quartiChiusi() {
-  return gironiChiusi() &&
-    bracket.QFA && bracket.QFA.isFinal === true &&
-    bracket.QFB && bracket.QFB.isFinal === true;
-}
-
-// Semifinali: SFA e SFB entrambi isFinal===true su Firebase
-function semifinaliChiuse() {
-  return quartiChiusi() &&
-    bracket.SFA && bracket.SFA.isFinal === true &&
-    bracket.SFB && bracket.SFB.isFinal === true;
+// Calcola il vincente di un match bracket (da Firebase o da punteggio)
+function computeWinner(bm) {
+  if (!bm) return null;
+  if (bm.winner) return bm.winner; // già valorizzato da Firebase
+  if (bm.scoreHome === null || bm.scoreHome === undefined ||
+      bm.scoreAway === null || bm.scoreAway === undefined) return null;
+  if (bm.scoreHome > bm.scoreAway) return bm.home;
+  if (bm.scoreAway > bm.scoreHome) return bm.away;
+  // Pareggio ai tempi regolamentari → rigori
+  if (bm.penHome !== null && bm.penAway !== null) {
+    return bm.penHome > bm.penAway ? bm.home : bm.away;
+  }
+  return null;
 }
 
 // ═══════════════════════════════════════
-//  BRACKET SEEDING — rispetta la gerarchia
+//  BRACKET SEEDING — progressione match-by-match
 // ═══════════════════════════════════════
 function seedBracket() {
-  const st  = computeStandings();
+  const gc = gironiChiusi();
+  const st = gc ? computeStandings() : [];
   const get = i => st[i] ? st[i].name : null;
 
-  // QUARTI: compilati solo se gironi chiusi
-  if (gironiChiusi()) {
+  // ── QUARTI ──
+  // Slot compilati solo dopo chiusura gironi; il winner blocca la riscrittura
+  if (gc) {
     if (!bracket.QFA.winner) { bracket.QFA.home = get(2); bracket.QFA.away = get(5); }
     if (!bracket.QFB.winner) { bracket.QFB.home = get(3); bracket.QFB.away = get(4); }
   } else {
-    // azzeramento nomi: i dati reali arrivano da Firebase solo dopo la chiusura
     if (!bracket.QFA.winner) { bracket.QFA.home = null; bracket.QFA.away = null; }
     if (!bracket.QFB.winner) { bracket.QFB.home = null; bracket.QFB.away = null; }
   }
 
-  // SEMIFINALI: compilate solo se quarti chiusi
-  if (quartiChiusi()) {
-    bracket.SFA.away = get(1);
-    bracket.SFB.away = get(0);
-    bracket.SFA.home = bracket.QFA.winner || null;
-    bracket.SFB.home = bracket.QFB.winner || null;
+  // ── SLOT DIRETTI IN SEMIFINALE (1ª e 2ª dai gironi) ──
+  if (gc) {
+    bracket.SFA.away = get(0); // 1ª classificata → SFA away
+    bracket.SFB.away = get(1); // 2ª classificata → SFB away
   } else {
-    if (!bracket.SFA.winner) { bracket.SFA.home = null; bracket.SFA.away = null; }
-    if (!bracket.SFB.winner) { bracket.SFB.home = null; bracket.SFB.away = null; }
+    if (!bracket.SFA.winner) bracket.SFA.away = null;
+    if (!bracket.SFB.winner) bracket.SFB.away = null;
   }
 
-  // FINALE: compilata solo se semifinali chiuse
-  if (semifinaliChiuse()) {
-    if (!bracket.FIN.winner) {
-      bracket.FIN.home = bracket.SFA.winner || null;
-      bracket.FIN.away = bracket.SFB.winner || null;
-    }
+  // ── QUARTI → SEMIFINALI (match-by-match, istantaneo) ──
+  // QFA chiuso → vincente entra in SFA home
+  if (bracket.QFA && bracket.QFA.isFinal) {
+    if (!bracket.SFA.winner) bracket.SFA.home = computeWinner(bracket.QFA);
   } else {
-    if (!bracket.FIN.winner) { bracket.FIN.home = null; bracket.FIN.away = null; }
+    if (!bracket.SFA.winner) bracket.SFA.home = null;
+  }
+  // QFB chiuso → vincente entra in SFB home
+  if (bracket.QFB && bracket.QFB.isFinal) {
+    if (!bracket.SFB.winner) bracket.SFB.home = computeWinner(bracket.QFB);
+  } else {
+    if (!bracket.SFB.winner) bracket.SFB.home = null;
+  }
+
+  // ── SEMIFINALI → FINALE (match-by-match, istantaneo) ──
+  // SFA chiusa → vincente entra in FIN home
+  if (bracket.SFA && bracket.SFA.isFinal) {
+    if (!bracket.FIN.winner) bracket.FIN.home = computeWinner(bracket.SFA);
+  } else {
+    if (!bracket.FIN.winner) bracket.FIN.home = null;
+  }
+  // SFB chiusa → vincente entra in FIN away
+  if (bracket.SFB && bracket.SFB.isFinal) {
+    if (!bracket.FIN.winner) bracket.FIN.away = computeWinner(bracket.SFB);
+  } else {
+    if (!bracket.FIN.winner) bracket.FIN.away = null;
   }
 }
+
+// Helper: true se il nome è una squadra reale (non un placeholder)
+const isRealTeam = t => !!(t && ALL_TEAMS.includes(t));
 
 // ═══════════════════════════════════════
 //  BRACKET RENDER
@@ -766,42 +781,30 @@ function stateBadge(hasScore, isFinal) {
 }
 
 // ═══════════════════════════════════════
-//  KNOCKOUT CALENDAR SLOTS — gerarchia di sblocco
+//  KNOCKOUT CALENDAR SLOTS — progressione match-by-match
 // ═══════════════════════════════════════
 function getKnockoutCalendarSlots() {
-  seedBracket();
-  const gc = gironiChiusi();
-  const qc = quartiChiusi();
-  const sc = semifinaliChiuse();
-
-  // Funzione che, dato il nome reale dal bracket e il placeholder,
-  // restituisce il nome reale solo se la fase prerequisita è chiusa
-  const resolved = (name, placeholder) => (name) ? name : placeholder;
-
+  seedBracket(); // aggiorna bracket con i vincenti calcolati
+  const ph = (name, fallback) => name || fallback;
   return [
-    // QUARTI: nomi reali solo se gironi chiusi
+    // QUARTI (slot disponibili solo dopo chiusura gironi)
     { day:'Mar 23 Giugno', time:'21:00', label:'Quarto di Finale A', bracketKey:'QFA',
-      calHome: gc ? resolved(bracket.QFA.home, '3ª Classificata') : '3ª Classificata',
-      calAway: gc ? resolved(bracket.QFA.away, '6ª Classificata') : '6ª Classificata',
-      showDetails: gc },
+      calHome: ph(bracket.QFA.home, '3ª Classificata'),
+      calAway: ph(bracket.QFA.away, '6ª Classificata') },
     { day:'Mar 23 Giugno', time:'22:00', label:'Quarto di Finale B', bracketKey:'QFB',
-      calHome: gc ? resolved(bracket.QFB.home, '4ª Classificata') : '4ª Classificata',
-      calAway: gc ? resolved(bracket.QFB.away, '5ª Classificata') : '5ª Classificata',
-      showDetails: gc },
-    // SEMIFINALI: nomi reali solo se quarti chiusi
+      calHome: ph(bracket.QFB.home, '4ª Classificata'),
+      calAway: ph(bracket.QFB.away, '5ª Classificata') },
+    // SEMIFINALI: away = 1ª/2ª (dopo gironi), home = vincente quarto (match-by-match)
     { day:'Gio 25 Giugno', time:'21:00', label:'Semifinale A', bracketKey:'SFA',
-      calHome: qc ? resolved(bracket.SFA.home, 'Vincente Quarto A') : 'Vincente Quarto A',
-      calAway: qc ? resolved(bracket.SFA.away, '2ª Classificata')   : '2ª Classificata',
-      showDetails: qc },
+      calHome: ph(bracket.SFA.home, 'Vincente Quarto A'),
+      calAway: ph(bracket.SFA.away, '1ª Classificata') },
     { day:'Gio 25 Giugno', time:'22:00', label:'Semifinale B', bracketKey:'SFB',
-      calHome: qc ? resolved(bracket.SFB.home, 'Vincente Quarto B') : 'Vincente Quarto B',
-      calAway: qc ? resolved(bracket.SFB.away, '1ª Classificata')   : '1ª Classificata',
-      showDetails: qc },
-    // FINALE: nomi reali solo se semifinali chiuse
+      calHome: ph(bracket.SFB.home, 'Vincente Quarto B'),
+      calAway: ph(bracket.SFB.away, '2ª Classificata') },
+    // FINALE: compilata man mano che le semi si chiudono
     { day:'Ven 26 Giugno', time:'22:00', label:'Finale 1°/2° Posto', bracketKey:'FIN',
-      calHome: sc ? resolved(bracket.FIN.home, 'Vincente Semi A') : 'Vincente Semi A',
-      calAway: sc ? resolved(bracket.FIN.away, 'Vincente Semi B') : 'Vincente Semi B',
-      showDetails: sc },
+      calHome: ph(bracket.FIN.home, 'Vincente Semi A'),
+      calAway: ph(bracket.FIN.away, 'Vincente Semi B') },
   ];
 }
 
@@ -901,8 +904,9 @@ function buildKnockoutBlock(slot) {
     : `<div class="score-tbd">VS</div>${badge}`;
   const homeName   = slot.calHome;
   const awayName   = slot.calAway;
-  const showHomeDetails = slot.showDetails && !!bm.home;
-  const showAwayDetails = slot.showDetails && !!bm.away;
+  // Mostra logo/sponsor solo se il nome è una squadra reale (non un placeholder)
+  const showHomeDetails = isRealTeam(bm.home);
+  const showAwayDetails = isRealTeam(bm.away);
   return `
   <div class="match-wrap">
     <div class="match-card knockout-match" onclick="openKnockoutModal('${slot.bracketKey}','${escHtml(slot.label)}','${escHtml(slot.time)}')">
@@ -933,18 +937,18 @@ function buildKnockoutBlock(slot) {
 // ═══════════════════════════════════════
 //  MODAL
 // ═══════════════════════════════════════
-function buildTeamHeader(team, showDetails) {
-  // showDetails===false → fase non ancora sbloccata: solo testo placeholder, niente logo né sponsor
-  const show = showDetails !== false;
-  const sp  = (show && team) ? SPONSORS[team] : null;
-  const src = (show && team) ? TEAM_LOGOS[team] : null;
-  const logoEl = show
-    ? (src ? `<img class="modal-th-team-logo" src="${src}" alt="${escHtml(team||'')}" onerror="this.style.visibility='hidden'">` : `<div style="width:36px;height:36px;flex-shrink:0"></div>`)
+function buildTeamHeader(team) {
+  // Mostra logo e sponsor solo se il nome è una squadra reale del torneo
+  const real = isRealTeam(team);
+  const sp  = real ? SPONSORS[team] : null;
+  const src = real ? TEAM_LOGOS[team] : null;
+  const logoEl = real
+    ? (src ? `<img class="modal-th-team-logo" src="${src}" alt="${escHtml(team)}" onerror="this.style.visibility='hidden'">` : `<div style="width:36px;height:36px;flex-shrink:0"></div>`)
     : '';
-  // Riga sponsor: visibile se presente, invisibile (ma presente per allineamento) se assente ma la fase è sbloccata
+  // Riga sponsor: visibile se presente, invisibile se assente ma squadra reale (allineamento marcatori)
   const spEl = sp
     ? `<span class="modal-th-sp-name js-fit" data-max-fs="13" data-min-fs="8">(${escHtml(sp.name)})</span>`
-    : (show ? `<span class="modal-th-sp-name" style="visibility:hidden">&nbsp;</span>` : '');
+    : (real ? `<span class="modal-th-sp-name" style="visibility:hidden">&nbsp;</span>` : '');
   return `<div class="modal-team-header">
     <div class="modal-th-row">
       ${logoEl}
@@ -956,7 +960,7 @@ function buildTeamHeader(team, showDetails) {
   </div>`;
 }
 
-function buildModalGrid(home, away, scoreHome, scoreAway, penHome, penAway, isFinal, goals, showDetails) {
+function buildModalGrid(home, away, scoreHome, scoreAway, penHome, penAway, isFinal, goals) {
   const hasScore = scoreHome !== null && scoreHome !== undefined;
   const isDraw   = hasScore && scoreHome === scoreAway && penHome !== null;
   const isLive   = hasScore && !isFinal;
@@ -992,12 +996,12 @@ function buildModalGrid(home, away, scoreHome, scoreAway, penHome, penAway, isFi
 
   return `
     <div class="modal-col">
-      ${buildTeamHeader(home, showDetails)}
+      ${buildTeamHeader(home)}
       <div class="modal-goal-list">${goalsHtml(homeGoals)}</div>
     </div>
     <div class="modal-col modal-col-center">${centerContent}</div>
     <div class="modal-col">
-      ${buildTeamHeader(away, showDetails)}
+      ${buildTeamHeader(away)}
       <div class="modal-goal-list">${goalsHtml(awayGoals)}</div>
     </div>`;
 }
@@ -1018,15 +1022,11 @@ function openGironeModal(matchId) {
 function openKnockoutModal(key, label, time) {
   const bm = bracket[key];
   if (!bm) return;
-  // Determina se mostrare loghi/sponsor in base alla fase
-  const show = (key==='QFA'||key==='QFB') ? gironiChiusi()
-             : (key==='SFA'||key==='SFB') ? quartiChiusi()
-             : semifinaliChiuse();
+  // buildTeamHeader usa isRealTeam internamente → nessun flag necessario
   document.getElementById('modal-title').textContent = label;
   document.getElementById('modal-time-row').textContent = `🕐 ${time}`;
   document.getElementById('modal-grid').innerHTML = buildModalGrid(
-    bm.home, bm.away, bm.scoreHome, bm.scoreAway, bm.penHome, bm.penAway, bm.isFinal, bm.goals,
-    show
+    bm.home, bm.away, bm.scoreHome, bm.scoreAway, bm.penHome, bm.penAway, bm.isFinal, bm.goals
   );
   document.getElementById('match-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
