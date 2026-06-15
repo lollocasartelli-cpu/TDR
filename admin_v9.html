@@ -1267,7 +1267,7 @@ function renderStandings() {
           </td>
           <td class="left"><div class="st-team">
             <div class="st-badge" style="background:${teamColor(t.name)}">${teamInitials(t.name)}</div>
-            ${teamLogoHtml(t.name, 28, "st-badge-logo")}
+            <div class="st-badge" style="background:${teamColor(t.name)}">${teamInitials(t.name)}</div>
             <span class="st-name">${t.name}</span>
           </div></td>
           <td>${t.g}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
@@ -1330,7 +1330,7 @@ function renderScorers() {
     <div class="scorer-row">
       <span class="scorer-pos ${posClass(i)}">${i+1}</span>
       <div class="scorer-badge" style="background:${teamColor(s.team)}">${teamInitials(s.team)}</div>
-      ${teamLogoHtml(s.team, 28, "scorer-badge-logo")}
+      <div class="scorer-badge" style="background:${teamColor(s.team)}">${teamInitials(s.team)}</div>
       <div class="scorer-info">
         <div class="scorer-name">${escHtml(s.name)}</div>
         <div class="scorer-team">${s.team}</div>
@@ -1400,7 +1400,7 @@ function renderBracket() {
     if (isLoser)  cls.push('loser');
     return `<div class="${cls.join(' ')}">
       <div class="bk-slot-badge" style="background:${has?teamColor(team):'#444'}">${teamInitials(team||'')}</div>
-      ${has ? teamLogoHtml(team, 32, "bk-slot-badge-logo") : '<div class="bk-slot-badge" style="background:#444">?</div>'}
+      <div class="bk-slot-badge" style="background:${has?teamColor(team):'#444'}">${teamInitials(team||'')}</div>
       <span class="bk-slot-name">${has?escHtml(team):'Da definire'}</span>
       ${penScore!==null&&penScore!==undefined?`<span class="bk-slot-pen">(${penScore})</span>`:''}
       <span class="bk-slot-score">${score!==null&&score!==undefined?score:''}</span>
