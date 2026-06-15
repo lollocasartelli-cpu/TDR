@@ -204,7 +204,7 @@ nav::-webkit-scrollbar{display:none}
 .modal-col-center{align-items:center;justify-content:center;gap:.4rem;padding:0 .5rem}
 /* team header nel modal */
 .modal-team-header{display:flex;flex-direction:column;gap:0}
-.modal-th-row{display:flex;align-items:center;gap:7px;min-width:0}
+.modal-th-row{display:flex;align-items:center;gap:7px;min-width:0;flex:1}
 .modal-th-team-logo{width:36px;height:36px;object-fit:contain;border-radius:50%;flex-shrink:0}
 .modal-th-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .modal-th-team-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -945,10 +945,10 @@ function buildTeamHeader(team) {
   const logoEl = real
     ? (src ? `<img class="modal-th-team-logo" src="${src}" alt="${escHtml(team)}" onerror="this.style.visibility='hidden'">` : `<div style="width:36px;height:36px;flex-shrink:0"></div>`)
     : '';
-  // Riga sponsor: visibile se presente, invisibile se assente ma squadra reale (allineamento marcatori)
+  // Riga sponsor: visibile solo se presente (niente placeholder invisibile che altera l'altezza)
   const spEl = sp
     ? `<span class="modal-th-sp-name js-fit" data-max-fs="13" data-min-fs="8">(${escHtml(sp.name)})</span>`
-    : (real ? `<span class="modal-th-sp-name" style="visibility:hidden">&nbsp;</span>` : '');
+    : '';
   return `<div class="modal-team-header">
     <div class="modal-th-row">
       ${logoEl}
