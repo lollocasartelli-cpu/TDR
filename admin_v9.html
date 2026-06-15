@@ -282,15 +282,10 @@ nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-i
 /* ── topbar sottile con eyebrow + X ── */
 .mm-topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:.55rem 1.5rem;
+  padding:.6rem 1.5rem;
   border-bottom:1px solid var(--border-strong);
   background:rgba(201,168,76,.05);
   flex-shrink:0;
-  position:relative; /* per posizionare badge centrato */
-}
-.mm-topbar-center{
-  position:absolute;left:50%;transform:translateX(-50%);
-  display:flex;align-items:center;gap:.4rem;
 }
 .mm-eyebrow{
   font-family:'Barlow Condensed',sans-serif;
@@ -330,9 +325,9 @@ nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-i
 /* colonne laterali */
 .mm-col-left {padding-right:28px;border-right:1px solid var(--border)}
 .mm-col-right{padding-left:28px; border-left:1px solid var(--border)}
-/* colonna centrale: flex-start per allineare score con i nomi squadra */
+/* colonna centrale: tutto centrato */
 .mm-col-center{
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:0 16px;
 }
 
@@ -354,18 +349,17 @@ nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-i
   box-shadow:0 4px 16px rgba(0,0,0,.4);
 }
 
-/* ── nome squadra: va a capo se multi-parola, si restringe se parola lunga ── */
+/* ── nome squadra: non va MAI a capo, si restringe se lungo ── */
 .mm-team-name{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(1.2rem,3.8vw,4.5rem);
+  font-size:clamp(1.6rem,4vw,4.5rem);
   font-weight:900;text-transform:uppercase;
-  letter-spacing:.03em;line-height:1.1;
+  letter-spacing:.03em;line-height:1.05;
   color:var(--text);
-  white-space:normal;
-  overflow-wrap:break-word;
-  word-break:break-word;
+  white-space:nowrap;        /* no wrap TASSATIVO */
   overflow:hidden;
-  min-width:0;flex:1;
+  text-overflow:ellipsis;    /* fallback se proprio non ci sta */
+  min-width:0;flex:1;        /* permette al flex di shrinkare il nome */
 }
 .mm-col-left  .mm-team-name{text-align:left}
 .mm-col-right .mm-team-name{text-align:right}
@@ -380,7 +374,7 @@ nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-i
 }
 
 /* ── lista marcatori ── */
-.mm-goal-list{flex:1;overflow-y:auto;margin-bottom:.6rem;margin-top:1.4rem}
+.mm-goal-list{flex:1;overflow-y:auto;margin-bottom:.6rem}
 .mm-goal-entry{
   display:flex;align-items:center;gap:8px;
   padding:7px 0;
@@ -389,15 +383,15 @@ nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-i
 .mm-goal-entry:last-child{border-bottom:none}
 /* palloni dinamici (generati via JS) */
 .mm-goal-balls{
-  font-size:clamp(1.2rem,2.6vw,1.8rem);
+  font-size:clamp(.9rem,2vw,1.3rem);
   flex-shrink:0;color:var(--gold);
   white-space:nowrap;
-  letter-spacing:-.05em;
+  letter-spacing:-.05em; /* pallini più vicini tra loro */
 }
 /* input inline modificabile (aspetto testo, funziona come field) */
 .mm-goal-inp{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(1.3rem,2.8vw,2rem);font-weight:700;flex:1;
+  font-size:clamp(1rem,2.3vw,1.6rem);font-weight:700;flex:1;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   color:var(--text);letter-spacing:.02em;
   background:transparent;border:none;border-bottom:1px solid transparent;
@@ -597,7 +591,7 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
 /* indicatore tempo (1° Tempo / 2° Tempo / Supplementari) */
 .mm-period-label{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(2rem,5vw,3.5rem);font-weight:900;
+  font-size:clamp(1rem,3.5vw,1.5rem);font-weight:900;
   letter-spacing:.18em;text-transform:uppercase;
   color:var(--text-muted);
 }
@@ -800,90 +794,6 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
 .st-badge-logo{width:28px;height:28px;flex-shrink:0}
 .bk-slot-badge-logo{width:32px;height:32px;flex-shrink:0}
 .scorer-badge-logo{width:28px;height:28px;flex-shrink:0}
-
-/* ── MODALITÀ PROIEZIONE ── */
-.hide-controls .mm-controls-group { display: none !important; }
-.mm-projection-btn, .mm-fullscreen-btn {
-  background: none;
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
-  color: var(--text-muted);
-  font-size: 1.1rem;
-  width: 40px; height: 40px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: border-color .15s, color .15s, background .15s;
-  flex-shrink: 0;
-}
-.mm-projection-btn:hover, .mm-fullscreen-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,.08); }
-.mm-projection-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,.12); }
-.mm-fullscreen-btn.active { border-color: var(--green); color: var(--green); background: rgba(60,184,122,.08); }
-
-/* ── LOGO+SPONSOR nel modal ── */
-.mm-team-logo-img {
-  width: 50px; height: 50px;
-  object-fit: contain;
-  border-radius: 50%;
-  flex-shrink: 0;
-  display: block;
-}
-.mm-sp-logo-img {
-  width: 46px; height: 46px;
-  object-fit: contain;
-  border-radius: 4px;
-  flex-shrink: 0;
-  display: block;
-}
-.mm-team-block {
-  display: flex; flex-direction: column; gap: 6px;
-  width: 100%; overflow: hidden; flex-shrink: 0;
-  min-height: 148px; /* copre 2 righe nome + sponsor, allinea marcatori */
-}
-.mm-team-row {
-  display: flex; align-items: center; gap: 12px;
-  width: 100%; overflow: hidden;
-}
-.mm-col-right .mm-team-row { flex-direction: row-reverse; }
-.mm-sp-row {
-  display: flex; align-items: center; gap: 12px;
-  width: 100%; overflow: hidden;
-}
-.mm-col-right .mm-sp-row { flex-direction: row-reverse; }
-.mm-team-name {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(1.2rem, 3.8vw, 4.5rem);
-  font-weight: 900; text-transform: uppercase;
-  letter-spacing: .03em; line-height: 1.1;
-  color: var(--text);
-  white-space: normal; overflow-wrap: break-word; word-break: break-word;
-  overflow: hidden;
-  min-width: 0; flex: 1;
-}
-.mm-col-left  .mm-team-name { text-align: left; }
-.mm-col-right .mm-team-name { text-align: right; }
-.mm-sp-name {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(1.1rem, 3.2vw, 3.8rem);
-  font-weight: 700; text-transform: uppercase;
-  letter-spacing: .03em; line-height: 1.1;
-  color: var(--gold);
-  white-space: normal; overflow-wrap: break-word; word-break: break-word;
-  overflow: hidden;
-  min-width: 0; flex: 1;
-}
-.mm-col-left  .mm-sp-name { text-align: left; }
-.mm-col-right .mm-sp-name { text-align: right; }
-
-/* colonna centrale: LIVE in cima, poi score, poi periodo, poi clock */
-.mm-col-center { justify-content: flex-start; padding-top: 0; gap: .3rem; }
-/* score in cima, allineato ai nomi squadra */
-.mm-col-center .mm-score-top {
-  display: flex; align-items: center; justify-content: center;
-  min-height: 148px; /* stessa min-height del mm-team-block */
-  flex-shrink: 0;
-}
-.mm-live-top { display: flex; justify-content: center; margin: .3rem 0 .1rem; flex-shrink: 0; }
-.mm-score { margin-bottom: .1rem; }
 </style>
 </head>
 <body>
@@ -942,17 +852,9 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
        MODAL TABELLINO A SCHERMO INTERO
   ════════════════════════════════════════════ -->
   <div id="match-modal-overlay">
-    <div class="mm-topbar" id="mm-topbar">
+    <div class="mm-topbar">
       <span class="mm-eyebrow" id="mm-eyebrow">Tabellino</span>
-      <!-- bottoni centrati: proiezione (nascondi comandi) -->
-      <div class="mm-topbar-center">
-        <button class="mm-projection-btn" id="mm-projection-btn" onclick="toggleProjection()" title="Modalità proiezione (nascondi comandi)">👁️</button>
-      </div>
-      <!-- destra: fullscreen + chiudi -->
-      <div style="display:flex;gap:.5rem;align-items:center">
-        <button class="mm-fullscreen-btn" id="mm-fullscreen-btn" onclick="toggleFullscreen()" title="Schermo intero">⛶</button>
-        <button class="mm-close-btn" onclick="closeMatchModal()" title="Chiudi">✕</button>
-      </div>
+      <button class="mm-close-btn" onclick="closeMatchModal()" title="Chiudi">✕</button>
     </div>
     <div class="mm-body" id="mm-body">
       <!-- contenuto iniettato da openMatchModal() -->
@@ -1074,25 +976,6 @@ const SPONSORS = {
   'Ex Residenti': { name: 'Pagani Luca snc',         logo: 'data:image/jpeg;base64,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' },
 };
 
-
-function mmTeamBlock(team, side) {
-  const real = isRealTeam(team);
-  const logoSrc = real ? TEAM_LOGOS[team] : null;
-  const sp = real ? SPONSORS[team] : null;
-  const logoEl = logoSrc
-    ? `<img class="mm-team-logo-img" src="${logoSrc}" alt="${escHtml(team)}" onerror="this.style.visibility='hidden'">`
-    : `<div style="width:50px;height:50px;flex-shrink:0"></div>`;
-  const spLogoSrc = sp ? sp.logo : null;
-  const spLogoEl = spLogoSrc
-    ? `<img class="mm-sp-logo-img" src="${spLogoSrc}" alt="${escHtml(sp.name)}" onerror="this.style.visibility='hidden'">`
-    : `<div style="width:46px;height:46px;flex-shrink:0"></div>`;
-  const spNameEl = sp ? `<span class="mm-sp-name">${escHtml(sp.name)}</span>` : '';
-  const spRow = sp ? `<div class="mm-sp-row">${spLogoEl}<span class="mm-sp-name">${escHtml(sp.name)}</span></div>` : '';
-  return `<div class="mm-team-block">
-    <div class="mm-team-row">${logoEl}<span class="mm-team-name">${escHtml(team||'—')}</span></div>
-    ${spRow}
-  </div>`;
-}
 function teamLogoHtml(team, size, extraClass) {
   const src = TEAM_LOGOS[team];
   const cls = 'team-logo-img ' + (extraClass||'');
@@ -1267,7 +1150,7 @@ function renderStandings() {
           </td>
           <td class="left"><div class="st-team">
             <div class="st-badge" style="background:${teamColor(t.name)}">${teamInitials(t.name)}</div>
-            <div class="st-badge" style="background:${teamColor(t.name)}">${teamInitials(t.name)}</div>
+            ${teamLogoHtml(t.name, 28, "st-badge-logo")}
             <span class="st-name">${t.name}</span>
           </div></td>
           <td>${t.g}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
@@ -1330,7 +1213,7 @@ function renderScorers() {
     <div class="scorer-row">
       <span class="scorer-pos ${posClass(i)}">${i+1}</span>
       <div class="scorer-badge" style="background:${teamColor(s.team)}">${teamInitials(s.team)}</div>
-      <div class="scorer-badge" style="background:${teamColor(s.team)}">${teamInitials(s.team)}</div>
+      ${teamLogoHtml(s.team, 28, "scorer-badge-logo")}
       <div class="scorer-info">
         <div class="scorer-name">${escHtml(s.name)}</div>
         <div class="scorer-team">${s.team}</div>
@@ -1400,7 +1283,7 @@ function renderBracket() {
     if (isLoser)  cls.push('loser');
     return `<div class="${cls.join(' ')}">
       <div class="bk-slot-badge" style="background:${has?teamColor(team):'#444'}">${teamInitials(team||'')}</div>
-      <div class="bk-slot-badge" style="background:${has?teamColor(team):'#444'}">${teamInitials(team||'')}</div>
+      ${has ? teamLogoHtml(team, 32, "bk-slot-badge-logo") : '<div class="bk-slot-badge" style="background:#444">?</div>'}
       <span class="bk-slot-name">${has?escHtml(team):'Da definire'}</span>
       ${penScore!==null&&penScore!==undefined?`<span class="bk-slot-pen">(${penScore})</span>`:''}
       <span class="bk-slot-score">${score!==null&&score!==undefined?score:''}</span>
@@ -2208,45 +2091,44 @@ function buildModalGirone(m) {
   return `
     <!-- COLONNA SINISTRA: squadra home + marcatori -->
     <div class="mm-col mm-col-left">
-      ${mmTeamBlock(m.home, 'home')}
+      <div class="mm-team-header">
+        <div class="mm-badge" style="background:${teamColor(m.home)}">${teamInitials(m.home)}</div>
+        <div class="mm-team-name">${m.home}</div>
+      </div>
+      <div class="mm-badge-wrap">${badge}</div>
       <div class="mm-team-divider"></div>
       <div class="mm-goal-list">${glHtml(homeGoals,'home')}</div>
-      <div class="mm-add-row mm-controls-group">
+      <div class="mm-add-row">
         <input class="mm-add-inp" type="text" id="mm-inp-home-${m.id}" placeholder="Aggiungi marcatore"
           onkeydown="if(event.key==='Enter')mmAddGoal(${m.id},'home')">
         <button class="mm-add-btn" onclick="mmAddGoal(${m.id},'home')">+</button>
       </div>
     </div>
 
-    <!-- COLONNA CENTRALE: punteggio + LIVE + periodo + timer + azioni -->
+    <!-- COLONNA CENTRALE: periodo + punteggio + timer + azioni -->
     <div class="mm-col mm-col-center">
-      <!-- punteggio gigante: allineato con nomi squadra -->
-      <div class="mm-score-top">
-        <div class="mm-score">
-          <input class="mm-score-inp" type="number" min="0" max="99" id="mm-sh-${m.id}"
-            value="${shVal}" placeholder="0">
-          <span class="mm-score-sep">–</span>
-          <input class="mm-score-inp" type="number" min="0" max="99" id="mm-sa-${m.id}"
-            value="${saVal}" placeholder="0">
-        </div>
-      </div>
-
-      <!-- 🔴 LIVE badge -->
-      <div class="mm-live-top">${badge}</div>
-
-      <!-- indicatore periodo -->
+      <!-- periodo -->
       <div class="mm-period-label" id="mm-period-label">1° Tempo</div>
+
+      <!-- punteggio: gli input sono il display E il campo di modifica -->
+      <div class="mm-score">
+        <input class="mm-score-inp" type="number" min="0" max="99" id="mm-sh-${m.id}"
+          value="${shVal}" placeholder="0">
+        <span class="mm-score-sep">–</span>
+        <input class="mm-score-inp" type="number" min="0" max="99" id="mm-sa-${m.id}"
+          value="${saVal}" placeholder="0">
+      </div>
 
       <!-- cronometro -->
       <div class="mm-timer-section">
         <div class="mm-clock" id="mm-clock">25:00</div>
         <div class="mm-overtime-label" id="mm-overtime-label">⏱ Tempo di recupero</div>
-        <div class="mm-timer-controls mm-controls-group">
+        <div class="mm-timer-controls">
           <button class="mm-timer-btn start"     onclick="timerStart()">▶ Avvia</button>
           <button class="mm-timer-btn pause"     onclick="timerPause()">⏸ Pausa</button>
           <button class="mm-timer-btn reset-btn" onclick="timerReset()">↺ Reset</button>
         </div>
-        <div class="mm-timer-controls mm-controls-group" style="margin-top:.1rem">
+        <div class="mm-timer-controls" style="margin-top:.1rem">
           <button class="mm-timer-btn active-period" id="mm-btn-p1"
             onclick="setPeriod(1,'girone')">1° Tempo</button>
           <button class="mm-timer-btn" id="mm-btn-p2"
@@ -2255,22 +2137,26 @@ function buildModalGirone(m) {
       </div>
 
       <!-- bottoni admin -->
-      <div class="mm-actions mm-controls-group">
+      <div class="mm-actions">
         <button class="mm-save-btn" onclick="mmSaveGirone(${m.id})">💾 Salva risultato</button>
         ${m.isFinal
           ? `<button class="mm-close-match-btn" style="border-color:var(--gold);color:var(--gold)" onclick="mmReopenGirone(${m.id})">🔓 Riapri partita</button>`
           : `<button class="mm-close-match-btn" onclick="mmCloseGirone(${m.id})">🔒 Chiudi partita (definitivo)</button>`
         }
-        <button class="mm-dismiss-btn mm-controls-group" onclick="closeMatchModal()">✕ Chiudi pannello</button>
+        <button class="mm-dismiss-btn" onclick="closeMatchModal()">✕ Chiudi pannello</button>
       </div>
     </div>
 
     <!-- COLONNA DESTRA: squadra away + marcatori -->
     <div class="mm-col mm-col-right">
-      ${mmTeamBlock(m.away, 'away')}
+      <div class="mm-team-header">
+        <div class="mm-badge" style="background:${teamColor(m.away)}">${teamInitials(m.away)}</div>
+        <div class="mm-team-name">${m.away}</div>
+      </div>
+      <div class="mm-badge-wrap"><!-- simmetria --></div>
       <div class="mm-team-divider"></div>
       <div class="mm-goal-list">${glHtml(awayGoals,'away')}</div>
-      <div class="mm-add-row mm-controls-group">
+      <div class="mm-add-row">
         <input class="mm-add-inp" type="text" id="mm-inp-away-${m.id}" placeholder="Aggiungi marcatore"
           onkeydown="if(event.key==='Enter')mmAddGoal(${m.id},'away')">
         <button class="mm-add-btn" onclick="mmAddGoal(${m.id},'away')">+</button>
@@ -2351,10 +2237,14 @@ function buildModalKnockout(key, bm, slot) {
   return `
     <!-- COLONNA SINISTRA: squadra home + marcatori -->
     <div class="mm-col mm-col-left">
-      ${mmTeamBlock(homeName, 'home')}
+      <div class="mm-team-header">
+        <div class="mm-badge" style="background:${homeColor}">${homeInit}</div>
+        <div class="mm-team-name">${escHtml(homeName)}</div>
+      </div>
+      <div class="mm-badge-wrap">${badge}</div>
       <div class="mm-team-divider"></div>
       <div class="mm-goal-list">${glHtml(homeGoals)}</div>
-      <div class="mm-add-row mm-controls-group">
+      <div class="mm-add-row">
         <input class="mm-add-inp" type="text" id="mm-kinp-home-${key}" placeholder="Aggiungi marcatore"
           onkeydown="if(event.key==='Enter')mmKoAddGoal('${key}','home')">
         <button class="mm-add-btn" onclick="mmKoAddGoal('${key}','home')">+</button>
@@ -2363,22 +2253,15 @@ function buildModalKnockout(key, bm, slot) {
 
     <!-- COLONNA CENTRALE -->
     <div class="mm-col mm-col-center">
-      <!-- punteggio gigante: allineato con nomi squadra -->
-      <div class="mm-score-top">
-        <div class="mm-score">
-          <input class="mm-score-inp" type="number" min="0" max="99" id="mm-ksh-${key}"
-            value="${kshVal}" placeholder="0">
-          <span class="mm-score-sep">–</span>
-          <input class="mm-score-inp" type="number" min="0" max="99" id="mm-ksa-${key}"
-            value="${ksaVal}" placeholder="0">
-        </div>
-      </div>
-
-      <!-- 🔴 LIVE badge -->
-      <div class="mm-live-top">${badge}</div>
-
-      <!-- indicatore periodo -->
       <div class="mm-period-label" id="mm-period-label">1° Tempo</div>
+
+      <div class="mm-score">
+        <input class="mm-score-inp" type="number" min="0" max="99" id="mm-ksh-${key}"
+          value="${kshVal}" placeholder="0">
+        <span class="mm-score-sep">–</span>
+        <input class="mm-score-inp" type="number" min="0" max="99" id="mm-ksa-${key}"
+          value="${ksaVal}" placeholder="0">
+      </div>
 
       ${isDraw ? `<div class="mm-pen-display">Rigori: ${bm.penHome} – ${bm.penAway}</div>` : ''}
       ${penSection}
@@ -2386,12 +2269,12 @@ function buildModalKnockout(key, bm, slot) {
       <div class="mm-timer-section">
         <div class="mm-clock" id="mm-clock">30:00</div>
         <div class="mm-overtime-label" id="mm-overtime-label">⏱ Tempo di recupero</div>
-        <div class="mm-timer-controls mm-controls-group">
+        <div class="mm-timer-controls">
           <button class="mm-timer-btn start"     onclick="timerStart()">▶ Avvia</button>
           <button class="mm-timer-btn pause"     onclick="timerPause()">⏸ Pausa</button>
           <button class="mm-timer-btn reset-btn" onclick="timerReset()">↺ Reset</button>
         </div>
-        <div class="mm-timer-controls mm-controls-group" style="margin-top:.1rem">
+        <div class="mm-timer-controls" style="margin-top:.1rem">
           <button class="mm-timer-btn active-period" id="mm-btn-p1"
             onclick="setPeriod(1,'knockout')">1° Tempo</button>
           <button class="mm-timer-btn" id="mm-btn-p2"
@@ -2401,22 +2284,26 @@ function buildModalKnockout(key, bm, slot) {
         </div>
       </div>
 
-      <div class="mm-actions mm-controls-group">
+      <div class="mm-actions">
         <button class="mm-save-btn" onclick="mmSaveKo('${key}')">💾 Salva risultato</button>
         ${bm.isFinal
           ? `<button class="mm-close-match-btn" style="border-color:var(--gold);color:var(--gold)" onclick="mmReopenKo('${key}')">🔓 Riapri partita</button>`
           : `<button class="mm-close-match-btn" onclick="mmCloseKo('${key}')">🔒 Chiudi partita (definitivo)</button>`
         }
-        <button class="mm-dismiss-btn mm-controls-group" onclick="closeMatchModal()">✕ Chiudi pannello</button>
+        <button class="mm-dismiss-btn" onclick="closeMatchModal()">✕ Chiudi pannello</button>
       </div>
     </div>
 
     <!-- COLONNA DESTRA: squadra away + marcatori -->
     <div class="mm-col mm-col-right">
-      ${mmTeamBlock(awayName, 'away')}
+      <div class="mm-team-header">
+        <div class="mm-badge" style="background:${awayColor}">${awayInit}</div>
+        <div class="mm-team-name">${escHtml(awayName)}</div>
+      </div>
+      <div class="mm-badge-wrap"><!-- simmetria --></div>
       <div class="mm-team-divider"></div>
       <div class="mm-goal-list">${glHtml(awayGoals)}</div>
-      <div class="mm-add-row mm-controls-group">
+      <div class="mm-add-row">
         <input class="mm-add-inp" type="text" id="mm-kinp-away-${key}" placeholder="Aggiungi marcatore"
           onkeydown="if(event.key==='Enter')mmKoAddGoal('${key}','away')">
         <button class="mm-add-btn" onclick="mmKoAddGoal('${key}','away')">+</button>
@@ -2639,46 +2526,6 @@ function renderAll(){
   renderBracket();
   renderScorers();
 }
-
-// ═══════════════════════════════════════
-//  MODALITÀ PROIEZIONE (nascondi comandi)
-// ═══════════════════════════════════════
-function toggleProjection() {
-  const overlay = document.getElementById('match-modal-overlay');
-  const btn = document.getElementById('mm-projection-btn');
-  if (!overlay || !btn) return;
-  const active = overlay.classList.toggle('hide-controls');
-  btn.classList.toggle('active', active);
-  btn.title = active ? 'Mostra comandi' : 'Modalità proiezione (nascondi comandi)';
-  btn.textContent = active ? '🙈' : '👁️';
-}
-
-// ═══════════════════════════════════════
-//  SCHERMO INTERO (Fullscreen API)
-// ═══════════════════════════════════════
-function toggleFullscreen() {
-  const overlay = document.getElementById('match-modal-overlay');
-  const btn     = document.getElementById('mm-fullscreen-btn');
-  const isFs    = !!(document.fullscreenElement || document.webkitFullscreenElement);
-  if (!isFs) {
-    const req = overlay.requestFullscreen || overlay.webkitRequestFullscreen;
-    if (req) req.call(overlay);
-  } else {
-    const ex = document.exitFullscreen || document.webkitExitFullscreen;
-    if (ex) ex.call(document);
-  }
-}
-document.addEventListener('fullscreenchange',     updateFsBtn);
-document.addEventListener('webkitfullscreenchange', updateFsBtn);
-function updateFsBtn() {
-  const btn  = document.getElementById('mm-fullscreen-btn');
-  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-  if (!btn) return;
-  btn.classList.toggle('active', isFs);
-  btn.title     = isFs ? 'Esci dallo schermo intero' : 'Schermo intero';
-  btn.textContent = isFs ? '⊡' : '⛶';
-}
-
 </script>
 </body>
 </html>
