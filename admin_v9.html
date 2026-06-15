@@ -596,7 +596,7 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
 /* indicatore tempo (1° Tempo / 2° Tempo / Supplementari) */
 .mm-period-label{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(1rem,3.5vw,1.5rem);font-weight:900;
+  font-size:clamp(2rem,5vw,3.5rem);font-weight:900;
   letter-spacing:.18em;text-transform:uppercase;
   color:var(--text-muted);
 }
@@ -2220,10 +2220,10 @@ function buildModalGirone(m) {
       <!-- punteggio gigante: allineato con nomi squadra -->
       <div class="mm-score-top">
         <div class="mm-score">
-          <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-sh-${m.id}"
+          <input class="mm-score-inp" type="number" min="0" max="99" id="mm-sh-${m.id}"
             value="${shVal}" placeholder="0">
           <span class="mm-score-sep">–</span>
-          <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-sa-${m.id}"
+          <input class="mm-score-inp" type="number" min="0" max="99" id="mm-sa-${m.id}"
             value="${saVal}" placeholder="0">
         </div>
       </div>
@@ -2363,10 +2363,10 @@ function buildModalKnockout(key, bm, slot) {
       <!-- punteggio gigante: allineato con nomi squadra -->
       <div class="mm-score-top">
         <div class="mm-score">
-          <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-ksh-${key}"
+          <input class="mm-score-inp" type="number" min="0" max="99" id="mm-ksh-${key}"
             value="${kshVal}" placeholder="0">
           <span class="mm-score-sep">–</span>
-          <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-ksa-${key}"
+          <input class="mm-score-inp" type="number" min="0" max="99" id="mm-ksa-${key}"
             value="${ksaVal}" placeholder="0">
         </div>
       </div>
