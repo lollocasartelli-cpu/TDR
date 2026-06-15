@@ -379,7 +379,7 @@ nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-i
 }
 
 /* ── lista marcatori ── */
-.mm-goal-list{flex:1;overflow-y:auto;margin-bottom:.6rem;margin-top:.6rem}
+.mm-goal-list{flex:1;overflow-y:auto;margin-bottom:.6rem;margin-top:1.4rem}
 .mm-goal-entry{
   display:flex;align-items:center;gap:8px;
   padding:7px 0;
@@ -836,7 +836,7 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
 .mm-team-block {
   display: flex; flex-direction: column; gap: 6px;
   width: 100%; overflow: hidden; flex-shrink: 0;
-  min-height: 116px; /* allinea sezione marcatori con/senza sponsor */
+  min-height: 148px; /* copre 2 righe nome + sponsor */
 }
 .mm-team-row {
   display: flex; align-items: center; gap: 12px;
@@ -850,22 +850,24 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
 .mm-col-right .mm-sp-row { flex-direction: row-reverse; }
 .mm-team-name {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(1.6rem, 4vw, 4.5rem);
+  font-size: clamp(1.2rem, 3.8vw, 4.5rem);
   font-weight: 900; text-transform: uppercase;
-  letter-spacing: .03em; line-height: 1.05;
+  letter-spacing: .03em; line-height: 1.1;
   color: var(--text);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  white-space: normal; overflow-wrap: break-word; word-break: break-word;
+  overflow: hidden;
   min-width: 0; flex: 1;
 }
 .mm-col-left  .mm-team-name { text-align: left; }
 .mm-col-right .mm-team-name { text-align: right; }
 .mm-sp-name {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(1.4rem, 3.5vw, 3.8rem);
+  font-size: clamp(1.1rem, 3.2vw, 3.8rem);
   font-weight: 700; text-transform: uppercase;
-  letter-spacing: .03em; line-height: 1.05;
+  letter-spacing: .03em; line-height: 1.1;
   color: var(--gold);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  white-space: normal; overflow-wrap: break-word; word-break: break-word;
+  overflow: hidden;
   min-width: 0; flex: 1;
 }
 .mm-col-left  .mm-sp-name { text-align: left; }
@@ -876,7 +878,7 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
 /* score in cima, allineato ai nomi squadra */
 .mm-col-center .mm-score-top {
   display: flex; align-items: center; justify-content: center;
-  min-height: 116px; /* stessa min-height del mm-team-block */
+  min-height: 148px; /* stessa min-height del mm-team-block */
   flex-shrink: 0;
 }
 .mm-live-top { display: flex; justify-content: center; margin: .3rem 0 .1rem; flex-shrink: 0; }
