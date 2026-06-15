@@ -202,15 +202,17 @@ nav::-webkit-scrollbar{display:none}
 .modal-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0;padding:.9rem .75rem 1rem}
 .modal-col{display:flex;flex-direction:column;gap:.5rem;min-width:0}
 .modal-col-center{align-items:center;justify-content:center;gap:.4rem;padding:0 .5rem}
-/* team header nel modal: due righe (squadra / sponsor), ciascuna con logo+testo sulla stessa riga */
-.modal-team-header{display:flex;flex-direction:column;gap:5px;min-height:60px}
+/* team header nel modal: logo a sinistra, colonna testo (nome+sponsor) a destra */
+.modal-team-header{display:flex;flex-direction:column;gap:0;min-height:60px}
 .modal-th-row{display:flex;align-items:center;gap:7px;min-width:0}
 .modal-th-team-logo{width:36px;height:36px;object-fit:contain;border-radius:50%;flex-shrink:0}
-.modal-th-sp-logo{width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0}
+/* .modal-th-text: colonna con nome squadra e sponsor allineati sotto il nome (non sotto il logo) */
+.modal-th-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .modal-th-team-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .modal-th-sp-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--sponsor-color);letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* right column: righe specchiate */
+/* right column: specchiato */
 .modal-col:last-child .modal-th-row{flex-direction:row-reverse}
+.modal-col:last-child .modal-th-text{align-items:flex-end}
 .modal-col:last-child .modal-th-team-name{text-align:right}
 .modal-col:last-child .modal-th-sp-name{text-align:right}
 /* scorers */
@@ -839,10 +841,9 @@ function buildKnockoutBlock(slot) {
     : `<div class="score-tbd">VS</div>${badge}`;
   const homeName   = slot.calHome;
   const awayName   = slot.calAway;
-  const homeColor  = bm.home ? teamColor(bm.home) : 'var(--text-dim)';
-  const awayColor  = bm.away ? teamColor(bm.away) : 'var(--text-dim)';
-  const hasSponsorH = bm.home && !!SPONSORS[bm.home];
-  const hasSponsorA = bm.away && !!SPONSORS[bm.away];
+  const gironiChiusi = allGironiClosed();
+  const showHomeDetails = gironiChiusi && !!bm.home;
+  const showAwayDetails = gironiChiusi && !!bm.away;
   return `
   <div class="match-wrap">
     <div class="match-card knockout-match" onclick="openKnockoutModal('${slot.bracketKey}','${escHtml(slot.label)}','${escHtml(slot.time)}')">
@@ -851,19 +852,19 @@ function buildKnockoutBlock(slot) {
         <span class="match-phase-label">· ${slot.label}</span>
       </div>
       <span class="match-chevron">›</span>
-      <div class="team-side" style="${bm.home&&SPONSORS[bm.home]?'align-items:flex-start':'align-items:center'}">
-        ${teamLogoHtml(bm.home||'', 28)}
+      <div class="team-side" style="${showHomeDetails&&SPONSORS[bm.home]?'align-items:flex-start':'align-items:center'}">
+        ${showHomeDetails ? teamLogoHtml(bm.home, 28) : ''}
         <div class="team-info">
-          <span class="team-name js-fit" data-max-fs="13" data-min-fs="8" style="${!bm.home?'color:var(--text-dim)':''}">${escHtml(homeName)}</span>
-          ${bm.home ? sponsorTagHtml(bm.home) : ''}
+          <span class="team-name js-fit" data-max-fs="13" data-min-fs="8" style="${!showHomeDetails?'color:var(--text-dim)':''}">${escHtml(homeName)}</span>
+          ${showHomeDetails ? sponsorTagHtml(bm.home) : ''}
         </div>
       </div>
       <div class="score-box">${scoreHtml}</div>
-      <div class="team-side right" style="${bm.away&&SPONSORS[bm.away]?'align-items:flex-start':'align-items:center'}">
-        ${teamLogoHtml(bm.away||'', 28)}
+      <div class="team-side right" style="${showAwayDetails&&SPONSORS[bm.away]?'align-items:flex-start':'align-items:center'}">
+        ${showAwayDetails ? teamLogoHtml(bm.away, 28) : ''}
         <div class="team-info" style="align-items:flex-end">
-          <span class="team-name js-fit" data-max-fs="13" data-min-fs="8" style="${!bm.away?'color:var(--text-dim)':''}">${escHtml(awayName)}</span>
-          ${bm.away ? sponsorTagHtml(bm.away) : ''}
+          <span class="team-name js-fit" data-max-fs="13" data-min-fs="8" style="${!showAwayDetails?'color:var(--text-dim)':''}">${escHtml(awayName)}</span>
+          ${showAwayDetails ? sponsorTagHtml(bm.away) : ''}
         </div>
       </div>
     </div>
@@ -873,23 +874,27 @@ function buildKnockoutBlock(slot) {
 // ═══════════════════════════════════════
 //  MODAL
 // ═══════════════════════════════════════
-function buildTeamHeader(team) {
-  const sp  = team ? SPONSORS[team] : null;
-  const src = team ? TEAM_LOGOS[team] : null;
-  // Riga sponsor sempre presente (invisibile se assente) → i marcatori si allineano orizzontalmente
+function buildTeamHeader(team, showDetails) {
+  // showDetails=true → mostra logo+sponsor; false/undefined → solo testo (per knockout prima che chiudano i gironi)
+  const show = showDetails !== false;
+  const sp  = (show && team) ? SPONSORS[team] : null;
+  const src = (show && team) ? TEAM_LOGOS[team] : null;
+  // Riga sponsor sempre presente (invisibile se assente) → i marcatori si allineano verticalmente
   const spRow = sp
     ? `<span class="modal-th-sp-name js-fit" data-max-fs="13" data-min-fs="8">(${escHtml(sp.name)})</span>`
     : `<span class="modal-th-sp-name" style="visibility:hidden">&nbsp;</span>`;
   return `<div class="modal-team-header">
     <div class="modal-th-row">
-      ${src ? `<img class="modal-th-team-logo" src="${src}" alt="${escHtml(team)}" onerror="this.style.visibility='hidden'">` : `<div style="width:36px;height:36px;flex-shrink:0"></div>`}
-      <span class="modal-th-team-name js-fit" data-max-fs="13" data-min-fs="8">${escHtml(team||'—')}</span>
+      ${src ? `<img class="modal-th-team-logo" src="${src}" alt="${escHtml(team)}" onerror="this.style.visibility='hidden'">` : (show ? `<div style="width:36px;height:36px;flex-shrink:0"></div>` : '')}
+      <div class="modal-th-text">
+        <span class="modal-th-team-name js-fit" data-max-fs="13" data-min-fs="8">${escHtml(team||'—')}</span>
+        ${spRow}
+      </div>
     </div>
-    ${spRow}
   </div>`;
 }
 
-function buildModalGrid(home, away, scoreHome, scoreAway, penHome, penAway, isFinal, goals) {
+function buildModalGrid(home, away, scoreHome, scoreAway, penHome, penAway, isFinal, goals, showDetails) {
   const hasScore = scoreHome !== null && scoreHome !== undefined;
   const isDraw   = hasScore && scoreHome === scoreAway && penHome !== null;
   const isLive   = hasScore && !isFinal;
@@ -908,18 +913,29 @@ function buildModalGrid(home, away, scoreHome, scoreAway, penHome, penAway, isFi
 
   const homeGoals = (goals||[]).filter(g=>g.side==='home');
   const awayGoals = (goals||[]).filter(g=>g.side==='away');
-  const goalsHtml = list => list.length
-    ? list.map(g=>`<div class="modal-goal-entry"><span class="modal-goal-ball">⚽</span><span>${escHtml(g.name)}</span></div>`).join('')
-    : `<div class="modal-empty">–</div>`;
+  // Raggruppa marcatori: stesso nome → una riga con tanti palloni quanti i gol
+  const groupGoals = list => {
+    const map = {};
+    list.forEach(g => { map[g.name] = (map[g.name]||0) + 1; });
+    return Object.entries(map);
+  };
+  const goalsHtml = list => {
+    const grouped = groupGoals(list);
+    return grouped.length
+      ? grouped.map(([name, count]) =>
+          `<div class="modal-goal-entry"><span class="modal-goal-ball">${'⚽'.repeat(count)}</span><span>${escHtml(name)}</span></div>`
+        ).join('')
+      : `<div class="modal-empty">–</div>`;
+  };
 
   return `
     <div class="modal-col">
-      ${buildTeamHeader(home)}
+      ${buildTeamHeader(home, showDetails)}
       <div class="modal-goal-list">${goalsHtml(homeGoals)}</div>
     </div>
     <div class="modal-col modal-col-center">${centerContent}</div>
     <div class="modal-col">
-      ${buildTeamHeader(away)}
+      ${buildTeamHeader(away, showDetails)}
       <div class="modal-goal-list">${goalsHtml(awayGoals)}</div>
     </div>`;
 }
@@ -943,7 +959,8 @@ function openKnockoutModal(key, label, time) {
   document.getElementById('modal-title').textContent = label;
   document.getElementById('modal-time-row').textContent = `🕐 ${time}`;
   document.getElementById('modal-grid').innerHTML = buildModalGrid(
-    bm.home, bm.away, bm.scoreHome, bm.scoreAway, bm.penHome, bm.penAway, bm.isFinal, bm.goals
+    bm.home, bm.away, bm.scoreHome, bm.scoreAway, bm.penHome, bm.penAway, bm.isFinal, bm.goals,
+    allGironiClosed()
   );
   document.getElementById('match-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
