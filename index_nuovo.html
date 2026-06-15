@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Torneo dei Rioni 2026 – 25° Torneo Oratorio San Carlo</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+/* ── THEME VARIABLES ── */
+:root {
+  --gold:#C9A84C;--gold-light:#E8C97A;--gold-dark:#8B6E2E;
+  --bg:#0E0E0F;--bg-card:#161618;--bg-card2:#1C1C1F;--bg-sheet:#121214;
+  --border:rgba(201,168,76,0.18);--border-strong:rgba(201,168,76,0.45);
+  --text:#F0EDE6;--text-muted:#8A8880;--text-dim:#5A5855;
+  --red:#E03C3C;--green:#3CB87A;--blue:#3C8EE0;
+  --modal-overlay:rgba(0,0,0,0.88);
+  --shadow-card:0 2px 12px rgba(0,0,0,0.4);
+  --sponsor-color:#C9A84C;        /* giallo/oro in dark */
+}
+[data-theme="light"] {
+  --bg:#F2F2F5;--bg-card:#FFFFFF;--bg-card2:#EBEBEE;--bg-sheet:#E5E5E8;
+  --border:rgba(0,0,0,0.10);--border-strong:rgba(201,168,76,0.55);
+  --text:#111111;--text-muted:#555555;--text-dim:#999999;
+  --modal-overlay:rgba(0,0,0,0.65);
+  --shadow-card:0 2px 12px rgba(0,0,0,0.10);
+  --sponsor-color:#333333;        /* grigio scuro in light */
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;line-height:1.5;min-height:100vh;transition:background .25s,color .25s}
+
+/* ── LOADING ── */
+#loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:1rem}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)}
+
+/* ── LIVE BADGE HEADER ── */
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(60,184,122,.12);border:1px solid rgba(60,184,122,.3);border-radius:20px;padding:3px 10px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3CB87A;margin-top:.75rem}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#3CB87A;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── HEADER ── */
+header{position:relative;text-align:center;padding:2.5rem 1rem 2rem;border-bottom:1px solid var(--border);overflow:hidden}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(201,168,76,0.08) 0%,transparent 70%);pointer-events:none}
+.header-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.header-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,8vw,3.5rem);font-weight:900;text-transform:uppercase;line-height:1;letter-spacing:.02em;color:var(--text)}
+.header-title span{color:var(--gold)}
+.header-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-top:.5rem}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle{position:absolute;top:1rem;right:1rem;background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:.35rem .75rem;cursor:pointer;font-size:16px;display:flex;align-items:center;gap:5px;color:var(--text-muted);transition:border-color .2s,background .2s;z-index:10}
+.theme-toggle:hover{border-color:var(--gold);color:var(--gold)}
+.theme-toggle-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+
+/* ── NAV ── */
+nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:var(--bg);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:.9rem .8rem;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .2s,border-color .2s;white-space:nowrap}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab:hover:not(.active){color:var(--text)}
+
+/* ── SECTIONS ── */
+.section{display:none;padding:1.25rem .85rem 5rem;max-width:700px;margin:0 auto}
+.section.active{display:block}
+.section-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--text-dim);margin-bottom:1rem}
+
+/* ── TEAM LOGO (universale) ── */
+/* wrapper circolare: mostra iniziali come fallback, immagine sovrapposta */
+.team-logo{position:relative;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.team-logo .tl-initials{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fff;text-transform:uppercase;line-height:1;position:relative;z-index:0}
+.team-logo .tl-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;z-index:1}
+
+/* ── CALENDAR ── */
+.giornata{margin-bottom:2rem}
+.giornata-header{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);padding:.4rem 0;border-bottom:1px solid var(--border);margin-bottom:.75rem}
+.giornata-header.knockout{color:var(--gold-light);border-bottom-color:var(--border-strong)}
+.match-wrap{margin-bottom:.55rem}
+
+/* card base */
+.match-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:2.1rem .75rem .75rem;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:.35rem;position:relative;user-select:none;cursor:pointer;transition:border-color .18s,background .18s;box-shadow:var(--shadow-card)}
+.match-card:hover{border-color:var(--border-strong);background:var(--bg-card2)}
+.match-card.knockout-match{border-left:3px solid var(--gold)}
+
+/* badge orario */
+.match-time-badge{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:7px;padding:.3rem .5rem;background:rgba(201,168,76,.07);border-bottom:1px solid var(--border);border-radius:9px 9px 0 0}
+.match-time-text{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.match-phase-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim)}
+.match-chevron{position:absolute;top:50%;right:10px;transform:translateY(-50%);font-size:12px;color:var(--text-dim);line-height:1}
+
+/* team side in card — align-items:center per centratura verticale quando non c'è sponsor */
+.team-side{display:flex;align-items:center;gap:7px;min-width:0}
+.team-side.right{flex-direction:row-reverse;text-align:right}
+
+/* team info stack in card */
+.team-info{min-width:0;display:flex;flex-direction:column;gap:1px}
+.team-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+/* sponsor universale: colore dinamico tramite variabile tema */
+.team-sponsor-tag{font-family:'Barlow Condensed',sans-serif;font-size:11.5px;font-weight:700;color:var(--sponsor-color);letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+
+/* score box */
+.score-box{text-align:center;flex-shrink:0}
+.score{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:900;letter-spacing:.08em;color:var(--text);display:flex;align-items:center;gap:5px;justify-content:center}
+.score-sep{color:var(--text-muted);font-weight:400}
+.score-tbd{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase}
+
+/* ── BADGES ── */
+.result-badge{display:inline-block;font-size:9px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:3px;margin-top:3px}
+.rb-tbd{background:rgba(90,88,85,.2);color:var(--text-dim)}
+.rb-final{background:rgba(201,168,76,.15);color:var(--gold)}
+.rb-live{background:rgba(224,60,60,.18);color:#ff6b6b;animation:livepulse 1.2s ease-in-out infinite}
+@keyframes livepulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* ── STANDINGS ── */
+.standings-table{width:100%;border-collapse:collapse;font-size:13px}
+.standings-table th{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);padding:.4rem .4rem;text-align:center;border-bottom:1px solid var(--border)}
+.standings-table th.left{text-align:left}
+.standings-table td{padding:.55rem .4rem;text-align:center;border-bottom:1px solid rgba(201,168,76,.06)}
+.standings-table td.left{text-align:left}
+.standings-table tr:hover td{background:rgba(201,168,76,.03)}
+.pos-cell{display:inline-flex;align-items:center;gap:5px}
+.pos-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:15px;width:20px;text-align:center}
+.pos-num-semi{color:#3CB87A}.pos-num-qf{color:#C9A84C}.pos-num-out{color:#E03C3C}
+.qual-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.qual-semi{background:#3CB87A}.qual-qf{background:#C9A84C}.qual-out{background:#E03C3C}
+.st-team{display:flex;align-items:center;gap:7px;min-width:0}
+.st-info{min-width:0}
+.st-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-sponsor{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--sponsor-color);letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pts{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;color:var(--gold)}
+.dr-pos{color:var(--green)}.dr-neg{color:var(--red)}.dr-zero{color:var(--text-muted)}
+.standings-legend{display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+
+/* ── MARCATORI ── */
+.scorer-row{display:flex;align-items:center;gap:.75rem;padding:.7rem .9rem;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;margin-bottom:.5rem;box-shadow:var(--shadow-card)}
+.scorer-pos{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;width:22px;text-align:center;flex-shrink:0}
+.scorer-info{flex:1;min-width:0}
+.scorer-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.03em}
+.scorer-team{font-size:11px;color:var(--text-muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.scorer-goals{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:900;color:var(--gold);flex-shrink:0}
+.scorer-goals-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);text-align:right;font-family:'Barlow Condensed',sans-serif}
+
+/* ── BRACKET ── */
+#tabellone{padding:1.25rem 0 5rem;max-width:100%}
+#tabellone .section-label{padding:0 .85rem}
+.bracket-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:.5rem 0 1.5rem;width:100%}
+.bracket{display:flex;align-items:stretch;min-width:640px;width:100%;padding:0 .85rem}
+.bk-round{flex:1;display:flex;flex-direction:column;justify-content:space-around;min-width:130px}
+.bk-round-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:.75rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+.bk-connectors{flex:0 0 32px;display:flex;flex-direction:column;position:relative}
+.bk-connectors svg{position:absolute;top:0;left:0;width:100%;height:100%;overflow:visible}
+.bk-matchup{position:relative;display:flex;flex-direction:column;margin:8px 0}
+.bk-slot{background:var(--bg-card);border:1px solid var(--border);border-radius:7px;padding:.35rem .55rem;margin:2px 0;display:flex;align-items:center;gap:6px;min-height:46px}
+.bk-slot.tbd{border-style:dashed;opacity:.5}
+.bk-slot.winner{border-color:var(--gold);background:rgba(201,168,76,.07)}
+.bk-slot.loser{opacity:.38}
+/* team logo inside bracket slot */
+.bk-slot-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.bk-slot-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk-slot-sponsor{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;color:var(--sponsor-color);letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk-slot-score{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--text);flex-shrink:0;min-width:14px;text-align:right}
+.bk-slot-pen{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;color:var(--gold);flex-shrink:0;line-height:1}
+.bk-divider{height:1px;background:var(--border);margin:0 4px}
+.bk-champion{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 .5rem}
+.bk-trophy{font-size:1.8rem;margin-bottom:.4rem}
+.bk-champion-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);text-align:center;line-height:1.2}
+.bk-champion-label{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);text-align:center;margin-top:3px}
+
+/* ── PHASE BANNER ── */
+.phase-banner{display:flex;align-items:center;gap:.75rem;margin:1.75rem 0 .85rem;padding:.6rem .85rem;background:linear-gradient(135deg,rgba(201,168,76,.1) 0%,rgba(201,168,76,.04) 100%);border:1px solid var(--border-strong);border-left:4px solid var(--gold);border-radius:0 8px 8px 0}
+.phase-banner-icon{font-size:1.1rem;flex-shrink:0}
+.phase-banner-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);line-height:1}
+.empty-msg{color:var(--text-muted);font-size:14px;text-align:center;padding:2rem 0}
+
+/* ── SPONSOR SECTION ── */
+.sponsor-grid{display:flex;flex-direction:column;gap:.75rem}
+.sponsor-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;display:flex;align-items:center;gap:1rem;box-shadow:var(--shadow-card);transition:border-color .18s}
+.sponsor-card:hover{border-color:var(--border-strong)}
+.sponsor-card-info{flex:1;min-width:0}
+.sponsor-team-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:var(--text)}
+.sponsor-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--sponsor-color);letter-spacing:.05em;margin-top:1px}
+.sponsor-no{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text-dim)}
+/* sponsor logo in section: larger, with border */
+.sponsor-logo-box{flex-shrink:0;width:64px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--bg-card2);border:1px solid var(--border);overflow:hidden;padding:4px}
+.sponsor-logo-box img{max-width:100%;max-height:100%;object-fit:contain}
+.sponsor-logo-placeholder{font-size:22px;color:var(--text-dim)}
+
+/* ── MODAL ── */
+#match-modal{position:fixed;inset:0;background:var(--modal-overlay);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+#match-modal.open{display:flex}
+.modal-box{background:var(--bg-card);border:1px solid var(--border-strong);border-radius:14px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.6);position:relative}
+.modal-header{padding:.85rem 1rem .6rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg-card);border-radius:14px 14px 0 0;z-index:1}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)}
+.modal-close{background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:6px;transition:color .15s,background .15s}
+.modal-close:hover{color:var(--text);background:rgba(201,168,76,.1)}
+.modal-time-row{text-align:center;padding:.5rem 1rem;border-bottom:1px solid var(--border);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+/* 3-column grid */
+.modal-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0;padding:.9rem .75rem 1rem}
+.modal-col{display:flex;flex-direction:column;gap:.5rem;min-width:0}
+.modal-col-center{align-items:center;justify-content:center;gap:.4rem;padding:0 .5rem}
+/* ─ team header: 2-column sub-grid (logo col | text col) perfettamente allineato ─ */
+.modal-team-header{display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto auto;column-gap:7px;row-gap:3px;align-items:center}
+/* logo occupa solo riga 1, col 1 — sponsor-logo su riga 2, col 1 */
+.modal-th-team-logo  {grid-column:1;grid-row:1;align-self:center}
+.modal-th-team-name  {grid-column:2;grid-row:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal-th-sp-logo    {grid-column:1;grid-row:2;width:22px;height:22px;object-fit:contain;border-radius:4px;justify-self:center}
+.modal-th-sp-name    {grid-column:2;grid-row:2;font-family:'Barlow Condensed',sans-serif;font-size:11.5px;font-weight:700;color:var(--sponsor-color);letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* right column: mirror (text right, logos right) */
+.modal-col:last-child .modal-team-header{grid-template-columns:1fr 30px}
+.modal-col:last-child .modal-th-team-logo{grid-column:2;grid-row:1;justify-self:center}
+.modal-col:last-child .modal-th-team-name{grid-column:1;grid-row:1;text-align:right}
+.modal-col:last-child .modal-th-sp-logo  {grid-column:2;grid-row:2;justify-self:center}
+.modal-col:last-child .modal-th-sp-name  {grid-column:1;grid-row:2;text-align:right}
+/* scorers */
+.modal-goal-list{display:flex;flex-direction:column;gap:2px}
+.modal-goal-entry{display:flex;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
+.modal-goal-ball{font-size:10px;flex-shrink:0;color:var(--gold)}
+.modal-empty{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text-dim)}
+.modal-col:last-child .modal-goal-entry{flex-direction:row-reverse;text-align:right}
+/* center col */
+.modal-live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(224,60,60,.15);border:1px solid rgba(224,60,60,.3);border-radius:12px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#ff6b6b;animation:livepulse 1.2s ease-in-out infinite}
+.modal-score{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:900;letter-spacing:.06em;color:var(--text);line-height:1}
+.modal-score-sep{color:var(--text-muted);font-weight:400}
+.modal-score-tbd{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--text-dim);letter-spacing:.08em}
+.modal-status{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
+.modal-pen{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.06em}
+.modal-status-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.modal-status-final{background:rgba(201,168,76,.15);color:var(--gold)}
+.modal-status-upcoming{background:rgba(90,88,85,.2);color:var(--text-dim)}
+
+@media(max-width:460px){
+  .team-name{font-size:11px}
+  .match-card{padding:1.9rem .6rem .65rem}
+  .modal-score{font-size:1.7rem}
+  .modal-th-team-name{font-size:11px}
+  .modal-grid{padding:.7rem .5rem .9rem}
+}
+</style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Connessione al database…</div>
+</div>
+
+<header>
+  <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Cambia tema">
+    <span id="theme-icon">☀️</span>
+    <span class="theme-toggle-label" id="theme-label">Light</span>
+  </button>
+  <div class="header-eyebrow">25° Torneo Oratorio San Carlo · Lurate Caccivio</div>
+  <h1 class="header-title">Torneo dei <span>Rioni</span></h1>
+  <div class="header-sub">15 Giugno – 26 Giugno 2026</div>
+  <div class="live-badge"><span class="live-dot"></span> Aggiornamento in tempo reale</div>
+</header>
+
+<nav>
+  <button class="tab active" onclick="showSection('calendario',this)">📅 Calendario</button>
+  <button class="tab"        onclick="showSection('classifica',this)">🏆 Classifica</button>
+  <button class="tab"        onclick="showSection('tabellone',this)">🔱 Tabellone</button>
+  <button class="tab"        onclick="showSection('marcatori',this)">⚽ Marcatori</button>
+  <button class="tab"        onclick="showSection('sponsor',this)">🤝 Sponsor</button>
+</nav>
+
+<section id="calendario" class="section active">
+  <div class="section-label">Tutte le partite · tocca una partita per i dettagli</div>
+  <div id="calendar-root"></div>
+</section>
+<section id="classifica" class="section">
+  <div class="section-label">Classifica generale — solo risultati fase a gironi</div>
+  <div id="standings-root"></div>
+</section>
+<section id="tabellone" class="section" style="padding-left:0;padding-right:0;max-width:100%">
+  <div class="section-label" style="padding:0 .85rem">Fase a eliminazione diretta · proiezione live dal girone</div>
+  <div class="bracket-scroll-wrap"><div id="bracket-root" class="bracket"></div></div>
+</section>
+<section id="marcatori" class="section">
+  <div class="section-label">Classifica marcatori · girone + fase finale</div>
+  <div id="scorers-root"></div>
+</section>
+<section id="sponsor" class="section">
+  <div class="section-label">Squadre e sponsor ufficiali del torneo</div>
+  <div id="sponsor-root"></div>
+</section>
+
+<!-- MODAL PARTITA -->
+<div id="match-modal" onclick="closeModalOnOverlay(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Dettagli partita</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-time-row" id="modal-time-row"></div>
+    <div class="modal-grid" id="modal-grid"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  FIREBASE CONFIG
+// ═══════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyDX4euVMB7nslf17dOvBWy6-ICsP7-cp-c",
+  authDomain: "torneo-rioni-2026.firebaseapp.com",
+  databaseURL: "https://torneo-rioni-2026-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "torneo-rioni-2026",
+  storageBucket: "torneo-rioni-2026.firebasestorage.app",
+  messagingSenderId: "158165475468",
+  appId: "1:158165475468:web:c5a0c3a8ebc8466b669ba9"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ═══════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════
+const TEAM_COLORS = {
+  'San Carlo':'#E03C3C','Castello':'#E07A3C','Monterotondo':'#3CB87A',
+  'Colombaio':'#3C6EE0','Madonnina':'#7B8CE0','Borgo':'#2B5FC5',
+  'Benedetta':'#C5A620','Malpaga':'#555566','Ex Residenti':'#9B3CE0','Stazione':'#A03030'
+};
+// Loghi reali squadre — cartella ./loghi/
+const TEAM_LOGOS = {
+  'San Carlo':    './loghi/sancarlo.png',
+  'Castello':     './loghi/castello.png',
+  'Monterotondo': './loghi/monterotondo.png',
+  'Colombaio':    './loghi/colombaio.png',
+  'Madonnina':    './loghi/madonnina.png',
+  'Borgo':        './loghi/borgo.png',
+  'Benedetta':    './loghi/benedetta.png',
+  'Malpaga':      './loghi/malpaga.png',
+  'Ex Residenti': './loghi/exresidenti.jpg',
+  'Stazione':     './loghi/stazione.png',
+};
+const SPONSORS = {
+  'San Carlo':    { name: 'Olly',                   logo: './loghi/olly.jpg' },
+  'Monterotondo': { name: 'Il Cavaliere',            logo: './loghi/cavaliere.png' },
+  'Madonnina':    { name: 'Pizzicheria & Bar 11',    logo: './loghi/pizzicheria.jpg' },
+  'Benedetta':    { name: 'Gelateria Rosso Fragola', logo: './loghi/rossofragola.png' },
+  'Colombaio':    { name: 'Carrozzeria Saini',       logo: './loghi/saini.jpg' },
+  'Ex Residenti': { name: 'Pagani Luca snc',         logo: './loghi/pagani.jpg' },
+};
+const ALL_TEAMS = ['San Carlo','Castello','Monterotondo','Colombaio','Madonnina',
+                   'Borgo','Benedetta','Malpaga','Ex Residenti','Stazione'];
+const BRACKET_KEYS = ['QFA','QFB','SFA','SFB','FIN'];
+
+const teamColor    = t => TEAM_COLORS[t] || '#666';
+const teamInitials = t => t ? t.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '?';
+const escHtml      = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+// ═══════════════════════════════════════
+//  TEAM LOGO HELPER (con fallback iniziali)
+// ═══════════════════════════════════════
+function teamLogoHtml(team, size) {
+  const bg   = teamColor(team);
+  const init = teamInitials(team);
+  const fs   = Math.round(size * 0.36);
+  const src  = TEAM_LOGOS[team];
+  const imgTag = src
+    ? `<img class="tl-img" src="${src}" alt="${escHtml(team)}" onerror="this.style.display='none'">`
+    : '';
+  return `<div class="team-logo" style="width:${size}px;height:${size}px;background:${bg}">
+    <span class="tl-initials" style="font-size:${fs}px">${init}</span>
+    ${imgTag}
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════
+function initTheme() {
+  const saved = localStorage.getItem('tdr-theme') || 'dark';
+  applyTheme(saved);
+}
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon  = document.getElementById('theme-icon');
+  const label = document.getElementById('theme-label');
+  if (theme === 'light') {
+    if (icon)  icon.textContent  = '🌙';
+    if (label) label.textContent = 'Dark';
+  } else {
+    if (icon)  icon.textContent  = '☀️';
+    if (label) label.textContent = 'Light';
+  }
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('tdr-theme', next);
+  applyTheme(next);
+}
+initTheme();
+
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
+let matches = [];
+let bracket = {};
+
+function allGironiClosed() {
+  return matches.length === 15 &&
+    matches.every(m => m.scoreHome !== null && m.scoreHome !== undefined && m.isFinal === true);
+}
+
+// ═══════════════════════════════════════
+//  SANITIZZAZIONE
+// ═══════════════════════════════════════
+function sanitizeData(data) {
+  if (data.matches) {
+    matches = Array.isArray(data.matches) ? data.matches : Object.values(data.matches);
+    matches.forEach(m => {
+      m.goals     = m.goals     || [];
+      m.scoreHome = (m.scoreHome !== undefined) ? m.scoreHome : null;
+      m.scoreAway = (m.scoreAway !== undefined) ? m.scoreAway : null;
+      m.isFinal   = m.isFinal   || false;
+    });
+  } else { matches = []; }
+  bracket = data.bracket || {};
+  BRACKET_KEYS.forEach(key => {
+    if (!bracket[key]) {
+      bracket[key] = {home:null,away:null,scoreHome:null,scoreAway:null,
+                      penHome:null,penAway:null,winner:null,goals:[],isFinal:false};
+    } else {
+      const bm = bracket[key];
+      bm.goals     = bm.goals     || [];
+      bm.home      = bm.home      || null;
+      bm.away      = bm.away      || null;
+      bm.scoreHome = (bm.scoreHome !== undefined) ? bm.scoreHome : null;
+      bm.scoreAway = (bm.scoreAway !== undefined) ? bm.scoreAway : null;
+      bm.penHome   = (bm.penHome   !== undefined) ? bm.penHome   : null;
+      bm.penAway   = (bm.penAway   !== undefined) ? bm.penAway   : null;
+      bm.winner    = bm.winner    || null;
+      bm.isFinal   = bm.isFinal   || false;
+    }
+  });
+}
+
+// ═══════════════════════════════════════
+//  FIREBASE
+// ═══════════════════════════════════════
+db.ref('/').on('value', function(snapshot) {
+  document.getElementById('loading-overlay').style.display = 'none';
+  if (!snapshot.exists()) { matches = []; bracket = {}; renderAll(); return; }
+  sanitizeData(snapshot.val());
+  renderAll();
+});
+
+// ═══════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════
+//  FIT TEXT
+// ═══════════════════════════════════════
+function runFitText() {
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.js-fit').forEach(el => {
+      const max = parseFloat(el.dataset.maxFs || 14);
+      const min = parseFloat(el.dataset.minFs || 8);
+      el.style.fontSize = max + 'px';
+      let i = 0;
+      while (el.scrollWidth > el.clientWidth + 1 && parseFloat(el.style.fontSize) > min && i++ < 30)
+        el.style.fontSize = (parseFloat(el.style.fontSize) - 0.5) + 'px';
+    });
+  });
+}
+
+// ═══════════════════════════════════════
+//  SPONSOR TAG (nel calendario/classifica)
+// ═══════════════════════════════════════
+function sponsorTagHtml(team) {
+  const sp = SPONSORS[team];
+  if (!sp) return '';
+  return `<span class="team-sponsor-tag js-fit" data-max-fs="11.5" data-min-fs="7">(${escHtml(sp.name)})</span>`;
+}
+
+// ═══════════════════════════════════════
+//  STANDINGS
+// ═══════════════════════════════════════
+function computeStandings() {
+  const teams = {};
+  [...new Set(matches.flatMap(m => [m.home, m.away]))]
+    .forEach(t => teams[t] = {name:t,pts:0,g:0,w:0,d:0,l:0,gf:0,ga:0});
+  matches.forEach(m => {
+    if (m.scoreHome === null || m.scoreHome === undefined) return;
+    const h = teams[m.home], a = teams[m.away];
+    h.g++; a.g++;
+    h.gf += m.scoreHome; h.ga += m.scoreAway;
+    a.gf += m.scoreAway; a.ga += m.scoreHome;
+    if      (m.scoreHome > m.scoreAway) { h.w++; a.l++; h.pts += 3; }
+    else if (m.scoreHome < m.scoreAway) { a.w++; h.l++; a.pts += 3; }
+    else                                { h.d++; a.d++; h.pts++; a.pts++; }
+  });
+  return Object.values(teams).sort((a,b) =>
+    b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga) || b.gf-a.gf
+  );
+}
+function posNumClass(i) { return i<=1?'pos-num pos-num-semi':i<=5?'pos-num pos-num-qf':'pos-num pos-num-out'; }
+function qualDotClass(i) { return i<=1?'qual-dot qual-semi':i<=5?'qual-dot qual-qf':'qual-dot qual-out'; }
+
+function renderStandings() {
+  const root = document.getElementById('standings-root');
+  const st   = computeStandings();
+  if (!st.length) { root.innerHTML = '<p class="empty-msg">In attesa dei dati…</p>'; return; }
+  const drClass = v => v>0?'dr-pos':v<0?'dr-neg':'dr-zero';
+  const drStr   = v => v>0?'+'+v:String(v);
+  root.innerHTML = `
+    <table class="standings-table">
+      <thead><tr>
+        <th style="width:40px">#</th><th class="left">Squadra</th>
+        <th>G</th><th>V</th><th>P</th><th>S</th><th>GF</th><th>GS</th><th>DR</th>
+        <th style="color:var(--gold)">PT</th>
+      </tr></thead>
+      <tbody>${st.map((t,i) => {
+        const sp = SPONSORS[t.name];
+        return `<tr>
+          <td><div class="pos-cell">
+            <span class="${posNumClass(i)}" title="${i<=1?'Semifinale diretta':i<=5?'Quarti di finale':'Eliminata'}">${i+1}</span>
+            <span class="${qualDotClass(i)}"></span>
+          </div></td>
+          <td class="left"><div class="st-team">
+            ${teamLogoHtml(t.name, 22)}
+            <div class="st-info">
+              <div class="st-name js-fit" data-max-fs="13" data-min-fs="8">${t.name}</div>
+              ${sp ? `<div class="st-sponsor js-fit" data-max-fs="11" data-min-fs="6">(${escHtml(sp.name)})</div>` : ''}
+            </div>
+          </div></td>
+          <td>${t.g}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
+          <td>${t.gf}</td><td>${t.ga}</td>
+          <td class="${drClass(t.gf-t.ga)}">${drStr(t.gf-t.ga)}</td>
+          <td><span class="pts">${t.pts}</span></td>
+        </tr>`;
+      }).join('')}
+      </tbody>
+    </table>
+    <div class="standings-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#3CB87A"></div> 1ª–2ª → Semifinali dirette</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#C9A84C"></div> 3ª–6ª → Quarti di finale</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#E03C3C"></div> 7ª–10ª → Eliminate</div>
+    </div>`;
+  runFitText();
+}
+
+// ═══════════════════════════════════════
+//  SCORERS
+// ═══════════════════════════════════════
+function computeScorers() {
+  const map = {};
+  matches.forEach(m => {
+    (m.goals||[]).forEach(g => {
+      const team = g.side==='home' ? m.home : m.away;
+      const key  = g.name+'|||'+team;
+      map[key] = (map[key]||0)+1;
+    });
+  });
+  BRACKET_KEYS.forEach(key => {
+    const bm = bracket[key];
+    if (!bm||!bm.home||!bm.away) return;
+    (bm.goals||[]).forEach(g => {
+      const team = g.side==='home' ? bm.home : bm.away;
+      const k    = g.name+'|||'+team;
+      map[k] = (map[k]||0)+1;
+    });
+  });
+  return Object.entries(map)
+    .map(([k,v]) => { const [name,team]=k.split('|||'); return {name,team,goals:v}; })
+    .sort((a,b) => b.goals-a.goals);
+}
+
+function renderScorers() {
+  const root   = document.getElementById('scorers-root');
+  const sorted = computeScorers();
+  if (!sorted.length) { root.innerHTML = '<p class="empty-msg">Nessun marcatore ancora registrato.</p>'; return; }
+  root.innerHTML = sorted.map((s,i) => `
+    <div class="scorer-row">
+      <span class="scorer-pos">${i+1}</span>
+      ${teamLogoHtml(s.team, 30)}
+      <div class="scorer-info">
+        <div class="scorer-name">${escHtml(s.name)}</div>
+        <div class="scorer-team">${s.team}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="scorer-goals">${s.goals}</div>
+        <div class="scorer-goals-label">gol</div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+//  SPONSORS SECTION
+// ═══════════════════════════════════════
+function renderSponsors() {
+  const root = document.getElementById('sponsor-root');
+  root.innerHTML = `<div class="sponsor-grid">${ALL_TEAMS.map(team => {
+    const sp = SPONSORS[team];
+    return `<div class="sponsor-card">
+      ${teamLogoHtml(team, 40)}
+      <div class="sponsor-card-info">
+        <div class="sponsor-team-name">${escHtml(team)}</div>
+        ${sp ? `<div class="sponsor-name">${escHtml(sp.name)}</div>` : `<div class="sponsor-no">Nessuno sponsor</div>`}
+      </div>
+      <div class="sponsor-logo-box">
+        ${sp
+          ? `<img src="${sp.logo}" alt="${escHtml(sp.name)}" loading="lazy" onerror="this.parentNode.innerHTML='<span class=\\'sponsor-logo-placeholder\\'>🤝</span>'">`
+          : `<span class="sponsor-logo-placeholder">—</span>`}
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ═══════════════════════════════════════
+//  BRACKET SEEDING
+// ═══════════════════════════════════════
+function seedBracket() {
+  const st  = computeStandings();
+  const get = i => st[i] ? st[i].name : null;
+  if (!bracket.QFA.winner) { bracket.QFA.home=get(2); bracket.QFA.away=get(5); }
+  if (!bracket.QFB.winner) { bracket.QFB.home=get(3); bracket.QFB.away=get(4); }
+  bracket.SFA.away = get(1);
+  bracket.SFB.away = get(0);
+  bracket.SFA.home = bracket.QFA.winner || null;
+  bracket.SFB.home = bracket.QFB.winner || null;
+  if (!bracket.FIN.winner) {
+    bracket.FIN.home = bracket.SFA.winner || null;
+    bracket.FIN.away = bracket.SFB.winner || null;
+  }
+}
+
+// ═══════════════════════════════════════
+//  BRACKET RENDER
+// ═══════════════════════════════════════
+function renderBracket() {
+  if (!bracket.QFA) { document.getElementById('bracket-root').innerHTML='<p class="empty-msg" style="padding:.85rem">In attesa dei dati…</p>'; return; }
+  seedBracket();
+  const root = document.getElementById('bracket-root');
+  const slot = (team, score, penScore, isWinner, isLoser) => {
+    const has = !!team;
+    const sp  = has ? SPONSORS[team] : null;
+    const cls = ['bk-slot'];
+    if (!has) cls.push('tbd');
+    if (isWinner) cls.push('winner');
+    if (isLoser)  cls.push('loser');
+    return `<div class="${cls.join(' ')}">
+      ${teamLogoHtml(team||'', 22)}
+      <div class="bk-slot-info">
+        <span class="bk-slot-name">${has ? escHtml(team) : 'Da definire'}</span>
+        ${sp ? `<span class="bk-slot-sponsor">${escHtml(sp.name)}</span>` : ''}
+      </div>
+      ${penScore!==null&&penScore!==undefined?`<span class="bk-slot-pen">(${penScore})</span>`:''}
+      <span class="bk-slot-score">${score!==null&&score!==undefined?score:''}</span>
+    </div>`;
+  };
+  const matchup = key => {
+    const bm = bracket[key];
+    if (!bm) return '';
+    const played = bm.scoreHome!==null && bm.scoreHome!==undefined &&
+                   bm.scoreAway!==null && bm.scoreAway!==undefined;
+    const isDraw = played && bm.scoreHome===bm.scoreAway && bm.penHome!==null;
+    const hw     = played && (bm.scoreHome>bm.scoreAway||(isDraw&&bm.penHome>bm.penAway));
+    const aw     = played && (bm.scoreAway>bm.scoreHome||(isDraw&&bm.penAway>bm.penHome));
+    return `<div class="bk-matchup">
+      ${slot(bm.home,bm.scoreHome,isDraw?bm.penHome:null,hw,aw)}
+      <div class="bk-divider"></div>
+      ${slot(bm.away,bm.scoreAway,isDraw?bm.penAway:null,aw,hw)}
+    </div>`;
+  };
+  const champ = bracket.FIN && bracket.FIN.winner;
+  const connSVG = `<svg viewBox="0 0 32 300" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:100%">
+    <line x1="0" y1="25%" x2="16" y2="25%" stroke="rgba(201,168,76,.28)" stroke-width="1.5"/>
+    <line x1="16" y1="25%" x2="16" y2="75%" stroke="rgba(201,168,76,.28)" stroke-width="1.5"/>
+    <line x1="0" y1="75%" x2="16" y2="75%" stroke="rgba(201,168,76,.28)" stroke-width="1.5"/>
+    <line x1="16" y1="50%" x2="32" y2="50%" stroke="rgba(201,168,76,.28)" stroke-width="1.5"/>
+  </svg>`;
+  const connFinalSVG = `<svg viewBox="0 0 32 100" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:100%">
+    <line x1="0" y1="50%" x2="32" y2="50%" stroke="rgba(201,168,76,.35)" stroke-width="1.5"/>
+  </svg>`;
+  root.innerHTML = `
+    <div class="bk-round"><div class="bk-round-label">Quarti di finale</div>${matchup('QFA')}${matchup('QFB')}</div>
+    <div class="bk-connectors" style="position:relative">${connSVG}</div>
+    <div class="bk-round"><div class="bk-round-label">Semifinali</div>${matchup('SFA')}${matchup('SFB')}</div>
+    <div class="bk-connectors" style="position:relative">${connSVG}</div>
+    <div class="bk-round" style="justify-content:center"><div class="bk-round-label">Finale</div>${matchup('FIN')}</div>
+    <div class="bk-connectors" style="position:relative">${connFinalSVG}</div>
+    <div class="bk-round" style="justify-content:center;min-width:100px">
+      <div class="bk-round-label">Vincitore</div>
+      <div class="bk-champion">
+        <div class="bk-trophy">🏆</div>
+        ${champ
+          ?`<div class="bk-champion-name">${escHtml(champ)}</div><div class="bk-champion-label">Campione 2026</div>`
+          :`<div class="bk-champion-name" style="color:var(--text-dim)">?</div><div class="bk-champion-label">In attesa</div>`}
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════
+//  STATO BADGE
+// ═══════════════════════════════════════
+function stateBadge(hasScore, isFinal) {
+  if (!hasScore) return `<span class="result-badge rb-tbd">In arrivo</span>`;
+  if (!isFinal)  return `<span class="result-badge rb-live">🔴 Live</span>`;
+  return               `<span class="result-badge rb-final">✓ Giocata</span>`;
+}
+
+// ═══════════════════════════════════════
+//  KNOCKOUT CALENDAR SLOTS
+// ═══════════════════════════════════════
+function getKnockoutCalendarSlots() {
+  seedBracket();
+  const gironiChiusi = allGironiClosed();
+  const calHome = (key, ph) => gironiChiusi ? (bracket[key].home || ph) : ph;
+  const calAway = (key, ph) => gironiChiusi ? (bracket[key].away || ph) : ph;
+  return [
+    { day:'Mar 23 Giugno', time:'21:00', label:'Quarto di Finale A', bracketKey:'QFA',
+      calHome: calHome('QFA','3ª Classificata'), calAway: calAway('QFA','6ª Classificata') },
+    { day:'Mar 23 Giugno', time:'22:00', label:'Quarto di Finale B', bracketKey:'QFB',
+      calHome: calHome('QFB','4ª Classificata'), calAway: calAway('QFB','5ª Classificata') },
+    { day:'Gio 25 Giugno', time:'21:00', label:'Semifinale A', bracketKey:'SFA',
+      calHome: gironiChiusi ? (bracket.SFA.home || 'Vincente Quarto A') : 'Vincente Quarto A',
+      calAway: gironiChiusi ? (bracket.SFA.away || '2ª Classificata')   : '2ª Classificata' },
+    { day:'Gio 25 Giugno', time:'22:00', label:'Semifinale B', bracketKey:'SFB',
+      calHome: gironiChiusi ? (bracket.SFB.home || 'Vincente Quarto B') : 'Vincente Quarto B',
+      calAway: gironiChiusi ? (bracket.SFB.away || '1ª Classificata')   : '1ª Classificata' },
+    { day:'Ven 26 Giugno', time:'22:00', label:'Finale 1°/2° Posto', bracketKey:'FIN',
+      calHome: gironiChiusi ? (bracket.FIN.home || 'Vincente Semi A') : 'Vincente Semi A',
+      calAway: gironiChiusi ? (bracket.FIN.away || 'Vincente Semi B') : 'Vincente Semi B' },
+  ];
+}
+
+// ═══════════════════════════════════════
+//  CALENDAR RENDER
+// ═══════════════════════════════════════
+function renderCalendar() {
+  const root = document.getElementById('calendar-root');
+  if (!matches.length) { root.innerHTML = '<p class="empty-msg">In attesa dei dati…</p>'; return; }
+
+  const grouped = {};
+  matches.forEach(m => {
+    if (!grouped[m.day]) grouped[m.day] = [];
+    grouped[m.day].push({...m, _type:'girone'});
+  });
+  getKnockoutCalendarSlots().forEach(slot => {
+    if (!grouped[slot.day]) grouped[slot.day] = [];
+    grouped[slot.day].push({...slot, _type:'knockout'});
+  });
+
+  const dayOrder = ['Lun 15 Giugno','Mar 16 Giugno','Gio 18 Giugno','Ven 19 Giugno',
+                    'Lun 22 Giugno','Mar 23 Giugno','Gio 25 Giugno','Ven 26 Giugno'];
+  const sortedDays = Object.keys(grouped).sort((a,b) => {
+    const ia=dayOrder.indexOf(a), ib=dayOrder.indexOf(b);
+    return (ia===-1?99:ia)-(ib===-1?99:ib);
+  });
+
+  const gironeDays    = ['Lun 15 Giugno','Mar 16 Giugno','Gio 18 Giugno','Ven 19 Giugno','Lun 22 Giugno'];
+  const dayPhaseLabel = { 'Mar 23 Giugno':'Quarti di Finale','Gio 25 Giugno':'Semifinali','Ven 26 Giugno':'Finali' };
+  const phaseIcon     = { 'Mar 23 Giugno':'⚔️','Gio 25 Giugno':'🏟️','Ven 26 Giugno':'🏆' };
+  const bannerInserted = {};
+  let html = '';
+
+  sortedDays.forEach(day => {
+    if (phaseIcon[day] && !bannerInserted[day]) {
+      html += `<div class="phase-banner">
+        <div class="phase-banner-icon">${phaseIcon[day]}</div>
+        <div><div class="phase-banner-title">${dayPhaseLabel[day]}</div></div>
+      </div>`;
+      bannerInserted[day] = true;
+    }
+    const isKO = !gironeDays.includes(day);
+    const dayLabel = isKO ? `${day} &mdash; ${dayPhaseLabel[day]}` : day;
+    html += `<div class="giornata">
+      <div class="giornata-header${isKO?' knockout':''}">${dayLabel}</div>
+      ${grouped[day].map(m => m._type==='knockout' ? buildKnockoutBlock(m) : buildGironeBlock(m)).join('')}
+    </div>`;
+  });
+
+  root.innerHTML = html;
+  runFitText();
+}
+
+// ── Blocco GIRONE ──
+function buildGironeBlock(m) {
+  const hasScore  = m.scoreHome!==null && m.scoreHome!==undefined;
+  const badge     = stateBadge(hasScore, m.isFinal);
+  const scoreHtml = hasScore
+    ? `<div class="score"><span>${m.scoreHome}</span><span class="score-sep">–</span><span>${m.scoreAway}</span></div>${badge}`
+    : `<div class="score-tbd">VS</div>${badge}`;
+  const hasSponsorH = !!SPONSORS[m.home];
+  const hasSponsorA = !!SPONSORS[m.away];
+  return `
+  <div class="match-wrap">
+    <div class="match-card" onclick="openGironeModal(${m.id})">
+      <div class="match-time-badge"><span class="match-time-text">🕐 ${m.time}</span></div>
+      <span class="match-chevron">›</span>
+      <div class="team-side" style="${hasSponsorH?'align-items:flex-start':'align-items:center'}">
+        ${teamLogoHtml(m.home, 28)}
+        <div class="team-info">
+          <span class="team-name js-fit" data-max-fs="13" data-min-fs="8">${m.home}</span>
+          ${sponsorTagHtml(m.home)}
+        </div>
+      </div>
+      <div class="score-box">${scoreHtml}</div>
+      <div class="team-side right" style="${hasSponsorA?'align-items:flex-start':'align-items:center'}">
+        ${teamLogoHtml(m.away, 28)}
+        <div class="team-info" style="align-items:flex-end">
+          <span class="team-name js-fit" data-max-fs="13" data-min-fs="8">${m.away}</span>
+          ${sponsorTagHtml(m.away)}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Blocco KNOCKOUT nel calendario ──
+function buildKnockoutBlock(slot) {
+  const bm        = bracket[slot.bracketKey];
+  const hasScore  = bm.scoreHome!==null && bm.scoreHome!==undefined;
+  const badge     = stateBadge(hasScore, bm.isFinal);
+  const isDraw    = hasScore && bm.scoreHome===bm.scoreAway && bm.penHome!==null;
+  const scoreHtml = hasScore
+    ? `<div class="score"><span>${bm.scoreHome}</span><span class="score-sep">–</span><span>${bm.scoreAway}</span></div>
+       ${isDraw?`<div style="font-size:9px;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:700;text-align:center;margin-top:1px">(R: ${bm.penHome}–${bm.penAway})</div>`:''}
+       ${badge}`
+    : `<div class="score-tbd">VS</div>${badge}`;
+  const homeName   = slot.calHome;
+  const awayName   = slot.calAway;
+  const homeColor  = bm.home ? teamColor(bm.home) : 'var(--text-dim)';
+  const awayColor  = bm.away ? teamColor(bm.away) : 'var(--text-dim)';
+  const hasSponsorH = bm.home && !!SPONSORS[bm.home];
+  const hasSponsorA = bm.away && !!SPONSORS[bm.away];
+  return `
+  <div class="match-wrap">
+    <div class="match-card knockout-match" onclick="openKnockoutModal('${slot.bracketKey}','${escHtml(slot.label)}','${escHtml(slot.time)}')">
+      <div class="match-time-badge">
+        <span class="match-time-text">🕐 ${slot.time}</span>
+        <span class="match-phase-label">· ${slot.label}</span>
+      </div>
+      <span class="match-chevron">›</span>
+      <div class="team-side" style="${hasSponsorH?'align-items:flex-start':'align-items:center'}">
+        ${teamLogoHtml(bm.home||'', 28)}
+        <div class="team-info">
+          <span class="team-name js-fit" data-max-fs="13" data-min-fs="8" style="${!bm.home?'color:var(--text-dim)':''}">${escHtml(homeName)}</span>
+          ${bm.home ? sponsorTagHtml(bm.home) : ''}
+        </div>
+      </div>
+      <div class="score-box">${scoreHtml}</div>
+      <div class="team-side right" style="${hasSponsorA?'align-items:flex-start':'align-items:center'}">
+        ${teamLogoHtml(bm.away||'', 28)}
+        <div class="team-info" style="align-items:flex-end">
+          <span class="team-name js-fit" data-max-fs="13" data-min-fs="8" style="${!bm.away?'color:var(--text-dim)':''}">${escHtml(awayName)}</span>
+          ${bm.away ? sponsorTagHtml(bm.away) : ''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════
+function buildTeamHeader(team) {
+  const sp = team ? SPONSORS[team] : null;
+  return `<div class="modal-team-header">
+    <div class="modal-th-team-logo">${teamLogoHtml(team||'', 28)}</div>
+    <span class="modal-th-team-name js-fit" data-max-fs="13" data-min-fs="8">${escHtml(team||'—')}</span>
+    ${sp ? `
+    <img class="modal-th-sp-logo" src="${sp.logo}" alt="${escHtml(sp.name)}" onerror="this.style.display='none'">
+    <span class="modal-th-sp-name js-fit" data-max-fs="11.5" data-min-fs="7">${escHtml(sp.name)}</span>` : ''}
+  </div>`;
+}
+
+function buildModalGrid(home, away, scoreHome, scoreAway, penHome, penAway, isFinal, goals) {
+  const hasScore = scoreHome !== null && scoreHome !== undefined;
+  const isDraw   = hasScore && scoreHome === scoreAway && penHome !== null;
+  const isLive   = hasScore && !isFinal;
+
+  let centerContent = '';
+  if (isLive) centerContent += `<div class="modal-live-badge"><span class="live-dot"></span>LIVE</div>`;
+  if (hasScore) {
+    centerContent += `<div class="modal-score"><span>${scoreHome}</span><span class="modal-score-sep"> – </span><span>${scoreAway}</span></div>`;
+    if (isDraw) centerContent += `<div class="modal-pen">Rig: ${penHome} – ${penAway}</div>`;
+    if (isFinal) centerContent += `<span class="modal-status-badge modal-status-final">Finale</span>`;
+    else         centerContent += `<div class="modal-status">In corso</div>`;
+  } else {
+    centerContent += `<div class="modal-score-tbd">VS</div>`;
+    centerContent += `<span class="modal-status-badge modal-status-upcoming">In arrivo</span>`;
+  }
+
+  const homeGoals = (goals||[]).filter(g=>g.side==='home');
+  const awayGoals = (goals||[]).filter(g=>g.side==='away');
+  const goalsHtml = list => list.length
+    ? list.map(g=>`<div class="modal-goal-entry"><span class="modal-goal-ball">⚽</span><span>${escHtml(g.name)}</span></div>`).join('')
+    : `<div class="modal-empty">–</div>`;
+
+  return `
+    <div class="modal-col">
+      ${buildTeamHeader(home)}
+      <div class="modal-goal-list">${goalsHtml(homeGoals)}</div>
+    </div>
+    <div class="modal-col modal-col-center">${centerContent}</div>
+    <div class="modal-col">
+      ${buildTeamHeader(away)}
+      <div class="modal-goal-list">${goalsHtml(awayGoals)}</div>
+    </div>`;
+}
+
+function openGironeModal(matchId) {
+  const m = matches.find(x => x.id == matchId);
+  if (!m) return;
+  document.getElementById('modal-title').textContent = 'Fase a Gironi';
+  document.getElementById('modal-time-row').textContent = `🕐 ${m.time}  ·  ${m.day}`;
+  document.getElementById('modal-grid').innerHTML = buildModalGrid(
+    m.home, m.away, m.scoreHome, m.scoreAway, null, null, m.isFinal, m.goals
+  );
+  document.getElementById('match-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  runFitText();
+}
+
+function openKnockoutModal(key, label, time) {
+  const bm = bracket[key];
+  if (!bm) return;
+  document.getElementById('modal-title').textContent = label;
+  document.getElementById('modal-time-row').textContent = `🕐 ${time}`;
+  document.getElementById('modal-grid').innerHTML = buildModalGrid(
+    bm.home, bm.away, bm.scoreHome, bm.scoreAway, bm.penHome, bm.penAway, bm.isFinal, bm.goals
+  );
+  document.getElementById('match-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  runFitText();
+}
+
+function closeModal() {
+  document.getElementById('match-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('match-modal')) closeModal();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ═══════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════
+function renderAll() {
+  renderCalendar();
+  renderStandings();
+  renderBracket();
+  renderScorers();
+  renderSponsors();
+}
+</script>
+</body>
+</html>
