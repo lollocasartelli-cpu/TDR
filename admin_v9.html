@@ -788,15 +788,12 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
   .scorers-col{padding:.65rem .7rem}
   .bk-round{min-width:115px}
 }
-<<<<<<< Updated upstream
-=======
 
 /* ── TEAM LOGOS ── */
 .team-logo-img{object-fit:contain;border-radius:50%;flex-shrink:0;display:block;vertical-align:middle}
 .st-badge-logo{width:28px;height:28px;flex-shrink:0}
 .bk-slot-badge-logo{width:32px;height:32px;flex-shrink:0}
 .scorer-badge-logo{width:28px;height:28px;flex-shrink:0}
->>>>>>> Stashed changes
 
 /* ── MODALITÀ PROIEZIONE ── */
 .hide-controls .mm-controls-group { display: none !important; }
@@ -1030,8 +1027,6 @@ const TEAM_COLORS = {
 };
 const teamColor    = t => TEAM_COLORS[t] || '#666';
 const teamInitials = t => t ? t.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '?';
-<<<<<<< Updated upstream
-=======
 const ALL_TEAMS = ['San Carlo','Castello','Monterotondo','Colombaio','Madonnina','Borgo','Benedetta','Malpaga','Ex Residenti','Stazione'];
 const isRealTeam = t => !!(t && ALL_TEAMS.includes(t));
 const TEAM_LOGOS = {
@@ -1080,7 +1075,6 @@ function teamLogoHtml(team, size, extraClass) {
   if (!src) return `<div class="st-badge" style="background:${teamColor(team)}">${teamInitials(team)}</div>`;
   return `<img class="${cls.trim()}" src="${src}" alt="${team}" width="${size}" height="${size}" onerror="this.outerHTML='<div class=\"st-badge\" style=\"background:${teamColor(team)}\">${teamInitials(team)}</div>'">`;
 }
->>>>>>> Stashed changes
 const escHtml      = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const BRACKET_KEYS = ['QFA','QFB','SFA','SFB','FIN'];
 
@@ -1248,11 +1242,8 @@ function renderStandings() {
             </div>
           </td>
           <td class="left"><div class="st-team">
-<<<<<<< Updated upstream
             <div class="st-badge" style="background:${teamColor(t.name)}">${teamInitials(t.name)}</div>
-=======
             ${teamLogoHtml(t.name, 28, "st-badge-logo")}
->>>>>>> Stashed changes
             <span class="st-name">${t.name}</span>
           </div></td>
           <td>${t.g}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
@@ -1314,11 +1305,8 @@ function renderScorers() {
   root.innerHTML = sorted.map((s,i) => `
     <div class="scorer-row">
       <span class="scorer-pos ${posClass(i)}">${i+1}</span>
-<<<<<<< Updated upstream
       <div class="scorer-badge" style="background:${teamColor(s.team)}">${teamInitials(s.team)}</div>
-=======
       ${teamLogoHtml(s.team, 28, "scorer-badge-logo")}
->>>>>>> Stashed changes
       <div class="scorer-info">
         <div class="scorer-name">${escHtml(s.name)}</div>
         <div class="scorer-team">${s.team}</div>
@@ -1387,11 +1375,8 @@ function renderBracket() {
     if (isWinner) cls.push('winner');
     if (isLoser)  cls.push('loser');
     return `<div class="${cls.join(' ')}">
-<<<<<<< Updated upstream
       <div class="bk-slot-badge" style="background:${has?teamColor(team):'#444'}">${teamInitials(team||'')}</div>
-=======
       ${has ? teamLogoHtml(team, 32, "bk-slot-badge-logo") : '<div class="bk-slot-badge" style="background:#444">?</div>'}
->>>>>>> Stashed changes
       <span class="bk-slot-name">${has?escHtml(team):'Da definire'}</span>
       ${penScore!==null&&penScore!==undefined?`<span class="bk-slot-pen">(${penScore})</span>`:''}
       <span class="bk-slot-score">${score!==null&&score!==undefined?score:''}</span>
