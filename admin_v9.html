@@ -282,10 +282,15 @@ nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-i
 /* ── topbar sottile con eyebrow + X ── */
 .mm-topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:.6rem 1.5rem;
+  padding:.55rem 1.5rem;
   border-bottom:1px solid var(--border-strong);
   background:rgba(201,168,76,.05);
   flex-shrink:0;
+  position:relative; /* per posizionare badge centrato */
+}
+.mm-topbar-center{
+  position:absolute;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:.4rem;
 }
 .mm-eyebrow{
   font-family:'Barlow Condensed',sans-serif;
@@ -325,9 +330,9 @@ nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-i
 /* colonne laterali */
 .mm-col-left {padding-right:28px;border-right:1px solid var(--border)}
 .mm-col-right{padding-left:28px; border-left:1px solid var(--border)}
-/* colonna centrale: tutto centrato */
+/* colonna centrale: flex-start per allineare score con i nomi squadra */
 .mm-col-center{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
   padding:0 16px;
 }
 
@@ -374,7 +379,7 @@ nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-i
 }
 
 /* ── lista marcatori ── */
-.mm-goal-list{flex:1;overflow-y:auto;margin-bottom:.6rem}
+.mm-goal-list{flex:1;overflow-y:auto;margin-bottom:.6rem;margin-top:.6rem}
 .mm-goal-entry{
   display:flex;align-items:center;gap:8px;
   padding:7px 0;
@@ -383,15 +388,15 @@ nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-i
 .mm-goal-entry:last-child{border-bottom:none}
 /* palloni dinamici (generati via JS) */
 .mm-goal-balls{
-  font-size:clamp(.9rem,2vw,1.3rem);
+  font-size:clamp(1.2rem,2.6vw,1.8rem);
   flex-shrink:0;color:var(--gold);
   white-space:nowrap;
-  letter-spacing:-.05em; /* pallini più vicini tra loro */
+  letter-spacing:-.05em;
 }
 /* input inline modificabile (aspetto testo, funziona come field) */
 .mm-goal-inp{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(1rem,2.3vw,1.6rem);font-weight:700;flex:1;
+  font-size:clamp(1.3rem,2.8vw,2rem);font-weight:700;flex:1;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   color:var(--text);letter-spacing:.02em;
   background:transparent;border:none;border-bottom:1px solid transparent;
@@ -797,7 +802,7 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
 
 /* ── MODALITÀ PROIEZIONE ── */
 .hide-controls .mm-controls-group { display: none !important; }
-.mm-projection-btn {
+.mm-projection-btn, .mm-fullscreen-btn {
   background: none;
   border: 1px solid var(--border-strong);
   border-radius: 8px;
@@ -809,8 +814,9 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
   transition: border-color .15s, color .15s, background .15s;
   flex-shrink: 0;
 }
-.mm-projection-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,.08); }
+.mm-projection-btn:hover, .mm-fullscreen-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,.08); }
 .mm-projection-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,.12); }
+.mm-fullscreen-btn.active { border-color: var(--green); color: var(--green); background: rgba(60,184,122,.08); }
 
 /* ── LOGO+SPONSOR nel modal ── */
 .mm-team-logo-img {
@@ -830,6 +836,7 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
 .mm-team-block {
   display: flex; flex-direction: column; gap: 6px;
   width: 100%; overflow: hidden; flex-shrink: 0;
+  min-height: 116px; /* allinea sezione marcatori con/senza sponsor */
 }
 .mm-team-row {
   display: flex; align-items: center; gap: 12px;
@@ -865,8 +872,14 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
 .mm-col-right .mm-sp-name { text-align: right; }
 
 /* colonna centrale: LIVE in cima, poi score, poi periodo, poi clock */
-.mm-col-center { justify-content: flex-start; padding-top: 1.5rem; gap: .5rem; }
-.mm-live-top { display: flex; justify-content: center; margin-bottom: .4rem; flex-shrink: 0; }
+.mm-col-center { justify-content: flex-start; padding-top: 0; gap: .3rem; }
+/* score in cima, allineato ai nomi squadra */
+.mm-col-center .mm-score-top {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 116px; /* stessa min-height del mm-team-block */
+  flex-shrink: 0;
+}
+.mm-live-top { display: flex; justify-content: center; margin: .3rem 0 .1rem; flex-shrink: 0; }
 .mm-score { margin-bottom: .1rem; }
 </style>
 </head>
@@ -926,9 +939,17 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
        MODAL TABELLINO A SCHERMO INTERO
   ════════════════════════════════════════════ -->
   <div id="match-modal-overlay">
-    <div class="mm-topbar">
+    <div class="mm-topbar" id="mm-topbar">
       <span class="mm-eyebrow" id="mm-eyebrow">Tabellino</span>
-      <button class="mm-close-btn" onclick="closeMatchModal()" title="Chiudi">✕</button>
+      <!-- bottoni centrati: proiezione (nascondi comandi) -->
+      <div class="mm-topbar-center">
+        <button class="mm-projection-btn" id="mm-projection-btn" onclick="toggleProjection()" title="Modalità proiezione (nascondi comandi)">👁️</button>
+      </div>
+      <!-- destra: fullscreen + chiudi -->
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <button class="mm-fullscreen-btn" id="mm-fullscreen-btn" onclick="toggleFullscreen()" title="Schermo intero">⛶</button>
+        <button class="mm-close-btn" onclick="closeMatchModal()" title="Chiudi">✕</button>
+      </div>
     </div>
     <div class="mm-body" id="mm-body">
       <!-- contenuto iniettato da openMatchModal() -->
@@ -2194,19 +2215,21 @@ function buildModalGirone(m) {
       </div>
     </div>
 
-    <!-- COLONNA CENTRALE: LIVE + punteggio + periodo + timer + azioni -->
+    <!-- COLONNA CENTRALE: punteggio + LIVE + periodo + timer + azioni -->
     <div class="mm-col mm-col-center">
-      <!-- 🔴 LIVE badge centrato in cima -->
-      <div class="mm-live-top">${badge}</div>
-
-      <!-- punteggio gigante -->
-      <div class="mm-score">
-        <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-sh-${m.id}"
-          value="${shVal}" placeholder="0">
-        <span class="mm-score-sep">–</span>
-        <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-sa-${m.id}"
-          value="${saVal}" placeholder="0">
+      <!-- punteggio gigante: allineato con nomi squadra -->
+      <div class="mm-score-top">
+        <div class="mm-score">
+          <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-sh-${m.id}"
+            value="${shVal}" placeholder="0">
+          <span class="mm-score-sep">–</span>
+          <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-sa-${m.id}"
+            value="${saVal}" placeholder="0">
+        </div>
       </div>
+
+      <!-- 🔴 LIVE badge -->
+      <div class="mm-live-top">${badge}</div>
 
       <!-- indicatore periodo -->
       <div class="mm-period-label" id="mm-period-label">1° Tempo</div>
@@ -2337,17 +2360,19 @@ function buildModalKnockout(key, bm, slot) {
 
     <!-- COLONNA CENTRALE -->
     <div class="mm-col mm-col-center">
-      <!-- 🔴 LIVE badge centrato in cima -->
-      <div class="mm-live-top">${badge}</div>
-
-      <!-- punteggio gigante -->
-      <div class="mm-score">
-        <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-ksh-${key}"
-          value="${kshVal}" placeholder="0">
-        <span class="mm-score-sep">–</span>
-        <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-ksa-${key}"
-          value="${ksaVal}" placeholder="0">
+      <!-- punteggio gigante: allineato con nomi squadra -->
+      <div class="mm-score-top">
+        <div class="mm-score">
+          <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-ksh-${key}"
+            value="${kshVal}" placeholder="0">
+          <span class="mm-score-sep">–</span>
+          <input class="mm-score-inp mm-controls-group" type="number" min="0" max="99" id="mm-ksa-${key}"
+            value="${ksaVal}" placeholder="0">
+        </div>
       </div>
+
+      <!-- 🔴 LIVE badge -->
+      <div class="mm-live-top">${badge}</div>
 
       <!-- indicatore periodo -->
       <div class="mm-period-label" id="mm-period-label">1° Tempo</div>
@@ -2623,6 +2648,32 @@ function toggleProjection() {
   btn.classList.toggle('active', active);
   btn.title = active ? 'Mostra comandi' : 'Modalità proiezione (nascondi comandi)';
   btn.textContent = active ? '🙈' : '👁️';
+}
+
+// ═══════════════════════════════════════
+//  SCHERMO INTERO (Fullscreen API)
+// ═══════════════════════════════════════
+function toggleFullscreen() {
+  const overlay = document.getElementById('match-modal-overlay');
+  const btn     = document.getElementById('mm-fullscreen-btn');
+  const isFs    = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  if (!isFs) {
+    const req = overlay.requestFullscreen || overlay.webkitRequestFullscreen;
+    if (req) req.call(overlay);
+  } else {
+    const ex = document.exitFullscreen || document.webkitExitFullscreen;
+    if (ex) ex.call(document);
+  }
+}
+document.addEventListener('fullscreenchange',     updateFsBtn);
+document.addEventListener('webkitfullscreenchange', updateFsBtn);
+function updateFsBtn() {
+  const btn  = document.getElementById('mm-fullscreen-btn');
+  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  if (!btn) return;
+  btn.classList.toggle('active', isFs);
+  btn.title     = isFs ? 'Esci dallo schermo intero' : 'Schermo intero';
+  btn.textContent = isFs ? '⊡' : '⛶';
 }
 
 </script>
