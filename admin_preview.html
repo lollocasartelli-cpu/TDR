@@ -273,7 +273,7 @@ nav{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;z-i
   width:100vw;height:100vh;
   z-index:9999;
   background:var(--bg);
-  overflow-y:auto;
+  overflow:hidden;
   animation:modalIn .22s ease;
 }
 #match-modal-overlay.open{display:flex;flex-direction:column}
@@ -883,140 +883,140 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
 .mm-score { margin-bottom: .1rem; }
 
 /* ══════════════════════════════════════
-   ADMIN PREVIEW — layout 2 colonne
+   ADMIN PREVIEW — layout 2 colonne v2
 ══════════════════════════════════════ */
 
-/* Barra timer full-width sopra le colonne */
-.mm-timer-bar{
-  display:flex;flex-direction:column;align-items:center;
-  gap:.35rem;
-  padding:.65rem 1rem .55rem;
-  border-bottom:1px solid var(--border);
-  background:rgba(0,0,0,.22);
-  flex-shrink:0;
-}
-.mm-timer-bar-top{
-  display:flex;align-items:center;gap:1.6rem;
-}
-.mm-timer-bar .mm-period-label{
-  font-size:clamp(1.4rem,3vw,2.2rem);
-  color:var(--text-muted);margin:0;
-}
-.mm-timer-bar .mm-clock{
-  font-size:clamp(2.2rem,5vw,3.8rem);
-  color:var(--text);
-}
-.mm-timer-bar .mm-clock.running{color:var(--gold)}
-.mm-timer-bar .mm-clock.overtime{color:var(--red)}
-.mm-timer-bar .mm-overtime-label{
-  font-size:clamp(.8rem,2vw,1.1rem);
-  display:none;color:var(--red);
-  font-family:'Barlow Condensed',sans-serif;font-weight:900;letter-spacing:.12em;text-transform:uppercase;
-}
-.mm-timer-bar .mm-overtime-label.visible{display:block}
-
-/* Griglia 2 colonne */
-.mm-body-2col{
-  flex:1;
+/* ── HEADER ROW: 3 colonne (home | timer | away) ── */
+.mm-header-row{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  min-height:0;
+  grid-template-columns:1fr minmax(170px,20%) 1fr;
+  align-items:center;
+  flex-shrink:0;
+  height:clamp(140px,22vh,200px);
   overflow:hidden;
+  border-bottom:1px solid var(--border);
 }
 
-/* Colonna halves */
-.mm-col-half{
-  display:flex;flex-direction:column;align-items:center;
-  padding:1.2rem 1.8rem 1rem;
-  overflow:hidden;
-  min-width:0;
+/* Blocco squadra nell'header */
+.mm-team-header-col{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;overflow:hidden;padding:.3rem .8rem;
 }
-.mm-col-half:first-child{border-right:1px solid var(--border)}
 
 /* Logo squadra XL */
 .mm-logo-xl{
-  width:clamp(70px,10vw,130px);
-  height:clamp(70px,10vw,130px);
-  object-fit:contain;
-  border-radius:50%;
-  flex-shrink:0;
-  display:block;
-  margin-bottom:.5rem;
+  width:clamp(44px,6.5vw,85px);
+  height:clamp(44px,6.5vw,85px);
+  object-fit:contain;border-radius:50%;
+  flex-shrink:0;display:block;margin-bottom:.25rem;
 }
 .mm-logo-xl-placeholder{
-  width:clamp(70px,10vw,130px);
-  height:clamp(70px,10vw,130px);
-  flex-shrink:0;
+  width:clamp(44px,6.5vw,85px);height:clamp(44px,6.5vw,85px);flex-shrink:0;
 }
 
 /* Nome squadra XL */
 .mm-team-name-xl{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(2rem,5.5vw,5.5rem);
+  font-size:clamp(1.3rem,3.8vw,3.8rem);
   font-weight:900;text-transform:uppercase;
-  letter-spacing:.03em;line-height:1.05;
-  color:var(--text);
+  letter-spacing:.03em;line-height:1.05;color:var(--text);
   text-align:center;
   white-space:normal;overflow-wrap:break-word;word-break:break-word;
-  margin-bottom:.15rem;
 }
 
 /* Nome sponsor XL */
 .mm-sp-name-xl{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(1.3rem,3.2vw,3.2rem);
+  font-size:clamp(.8rem,2vw,1.8rem);
   font-weight:700;text-transform:uppercase;
-  color:var(--gold);
-  text-align:center;
+  color:var(--gold);text-align:center;
   white-space:normal;overflow-wrap:break-word;word-break:break-word;
-  margin-bottom:.6rem;
+  margin-top:.1rem;
 }
 
-/* Punteggio gigante nella colonna */
+/* Centro header: badge LIVE + periodo + clock + controlli */
+.mm-header-center{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;gap:.15rem;padding:.2rem .4rem;
+  border-left:1px solid var(--border);border-right:1px solid var(--border);
+}
+.mm-header-center .mm-period-label{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(.9rem,1.8vw,1.4rem);font-weight:900;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin:0;
+}
+.mm-header-center .mm-clock{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(1.8rem,4vw,3rem);font-weight:900;
+  letter-spacing:.04em;color:var(--text);line-height:1;
+}
+.mm-header-center .mm-clock.running{color:var(--gold)}
+.mm-header-center .mm-clock.overtime{color:var(--red)}
+.mm-header-center .mm-overtime-label{
+  font-size:clamp(.65rem,1.3vw,.85rem);display:none;color:var(--red);
+  font-family:'Barlow Condensed',sans-serif;font-weight:900;
+  letter-spacing:.1em;text-transform:uppercase;
+}
+.mm-header-center .mm-overtime-label.visible{display:block}
+.mm-header-center .mm-timer-controls{
+  display:flex;flex-wrap:wrap;gap:.2rem;justify-content:center;margin-top:.15rem;
+}
+
+/* ── RIGA PUNTEGGI ── */
+.mm-score-row{
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;gap:1rem;
+  padding:.15rem 1rem;
+  border-bottom:1px solid var(--border);
+  background:rgba(0,0,0,.18);
+}
+.mm-score-dash{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(2.5rem,9vw,6.5rem);font-weight:900;
+  color:var(--text-dim);line-height:1;flex-shrink:0;
+}
+
+/* Punteggio gigante */
 .mm-col-score-inp{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(5rem,16vw,12rem);
-  font-weight:900;
-  width:clamp(4rem,14vw,10rem);
-  background:transparent;
-  border:none;
-  border-bottom:4px solid var(--border-strong);
-  color:var(--text);
-  text-align:center;
-  padding:0;
-  -moz-appearance:textfield;
-  line-height:1;
-  margin-bottom:.3rem;
+  font-size:clamp(3.5rem,11vw,8.5rem);font-weight:900;
+  width:clamp(3rem,10vw,7.5rem);background:transparent;
+  border:none;border-bottom:3px solid var(--border-strong);
+  color:var(--text);text-align:center;padding:0;
+  -moz-appearance:textfield;line-height:1;
 }
 .mm-col-score-inp::-webkit-inner-spin-button,
 .mm-col-score-inp::-webkit-outer-spin-button{-webkit-appearance:none}
 .mm-col-score-inp:focus{outline:none;border-bottom-color:var(--gold)}
 body.light-mode .mm-col-score-inp{color:var(--text);background:transparent}
 
-/* Divisore sottile */
-.mm-col-divider{
-  width:100%;height:1px;background:var(--border);
-  margin:.5rem 0 .6rem;opacity:.5;flex-shrink:0;
+/* ── RIGA MARCATORI: 2 colonne ── */
+.mm-scorers-row{
+  display:grid;grid-template-columns:1fr 1fr;
+  flex:1;min-height:0;overflow:hidden;
 }
+.mm-scorers-col{
+  display:flex;flex-direction:column;
+  padding:.5rem 1rem .4rem;
+  overflow:hidden;min-width:0;
+}
+.mm-scorers-col:first-child{border-right:1px solid var(--border)}
 
-/* Lista marcatori XL */
-.mm-scorers-xl{
-  width:100%;flex:1;overflow-y:auto;
-}
+/* Lista marcatori */
+.mm-scorers-xl{width:100%;flex:1;overflow-y:auto;}
 .mm-goal-entry-xl{
   display:flex;align-items:center;justify-content:center;
-  gap:8px;
-  padding:6px 0;
+  gap:8px;padding:5px 0;
   border-bottom:1px solid rgba(201,168,76,.1);
 }
 .mm-goal-entry-xl:last-child{border-bottom:none}
 .mm-goal-balls-xl{
-  font-size:clamp(1.2rem,2.5vw,2rem);
-  color:var(--gold);flex-shrink:0;white-space:nowrap;letter-spacing:-.05em;
+  font-size:clamp(1rem,1.8vw,1.6rem);color:var(--gold);
+  flex-shrink:0;white-space:nowrap;letter-spacing:-.05em;
 }
 .mm-goal-inp-xl{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(1.3rem,2.8vw,2.2rem);font-weight:700;
+  font-size:clamp(1rem,2.2vw,1.8rem);font-weight:700;
   color:var(--text);flex:1;text-align:center;
   background:transparent;border:none;border-bottom:1px solid transparent;
   padding:0;cursor:text;min-width:0;transition:border-color .15s;
@@ -1027,27 +1027,26 @@ body.light-mode .mm-col-score-inp{color:var(--text);background:transparent}
 }
 .mm-goal-del-xl{
   background:none;border:none;color:var(--text-dim);cursor:pointer;
-  font-size:1.1rem;padding:0 3px;line-height:1;flex-shrink:0;transition:color .15s;
+  font-size:1rem;padding:0 3px;line-height:1;flex-shrink:0;transition:color .15s;
 }
 .mm-goal-del-xl:hover{color:var(--red)}
 
-/* Riga aggiungi marcatore XL */
+/* Riga aggiungi marcatore */
 .mm-add-row-xl{
   display:flex;gap:6px;align-items:center;
-  width:100%;margin-top:auto;padding-top:.5rem;
-  flex-shrink:0;
+  width:100%;padding-top:.35rem;flex-shrink:0;
 }
 .mm-add-inp-xl{
   flex:1;min-width:0;
   background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;
   color:var(--text);font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(.9rem,1.8vw,1.2rem);padding:.45rem .7rem;
+  font-size:clamp(.8rem,1.5vw,1rem);padding:.38rem .55rem;
 }
 .mm-add-inp-xl:focus{outline:none;border-color:var(--gold)}
 .mm-add-inp-xl::placeholder{color:var(--text-dim)}
 .mm-add-btn-xl{
   background:var(--gold);color:#000;border:none;border-radius:8px;
-  width:38px;height:38px;font-size:1.5rem;font-weight:900;
+  width:34px;height:34px;font-size:1.3rem;font-weight:900;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   flex-shrink:0;transition:background .15s;
 }
@@ -1056,26 +1055,22 @@ body.light-mode .mm-add-inp-xl{background:#E8E8EE;color:var(--text)}
 
 /* Barra azioni in fondo */
 .mm-actions-bar{
-  display:flex;gap:.5rem;
-  padding:.65rem 1.5rem;
+  display:flex;gap:.5rem;padding:.45rem 1rem;
   border-top:1px solid var(--border);
   background:rgba(0,0,0,.12);
   flex-shrink:0;flex-wrap:wrap;justify-content:center;
 }
 
-/* Rigori (knockout) nella colonna */
+/* Rigori */
 .mm-col-pen-row{
-  display:flex;align-items:center;gap:.4rem;
-  padding:.3rem .6rem;
-  background:rgba(201,168,76,.06);
-  border:1px solid var(--border);border-radius:9px;
-  margin-bottom:.3rem;
+  display:flex;align-items:center;gap:.4rem;padding:.25rem .5rem;
+  background:rgba(201,168,76,.06);border:1px solid var(--border);border-radius:9px;
 }
 .mm-col-pen-inp{
-  flex:1;background:transparent;
-  border:none;border-bottom:2px solid var(--border-strong);
+  flex:1;background:transparent;border:none;
+  border-bottom:2px solid var(--border-strong);
   color:var(--gold);font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(1.5rem,4vw,3rem);font-weight:900;
+  font-size:clamp(1.2rem,3vw,2.2rem);font-weight:900;
   text-align:center;padding:0;-moz-appearance:textfield;
 }
 .mm-col-pen-inp::-webkit-inner-spin-button,.mm-col-pen-inp::-webkit-outer-spin-button{-webkit-appearance:none}
@@ -1144,12 +1139,11 @@ body.light-mode .mm-add-inp-xl{background:#E8E8EE;color:var(--text)}
   <div id="match-modal-overlay">
     <div class="mm-topbar" id="mm-topbar">
       <span class="mm-eyebrow" id="mm-eyebrow">Tabellino</span>
-      <!-- bottoni centrati: proiezione (nascondi comandi) -->
       <div class="mm-topbar-center">
-        <button class="mm-projection-btn" id="mm-projection-btn" onclick="toggleProjection()" title="Modalità proiezione (nascondi comandi)">👁️</button>
+        <span id="mm-topbar-title" style="font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted)"></span>
       </div>
-      <!-- destra: fullscreen + chiudi -->
       <div style="display:flex;gap:.5rem;align-items:center">
+        <button class="mm-projection-btn" id="mm-projection-btn" onclick="toggleProjection()" title="Modalità proiezione (nascondi comandi)">👁️</button>
         <button class="mm-fullscreen-btn" id="mm-fullscreen-btn" onclick="toggleFullscreen()" title="Schermo intero">⛶</button>
         <button class="mm-close-btn" onclick="closeMatchModal()" title="Chiudi">✕</button>
       </div>
@@ -2389,7 +2383,7 @@ function buildModalGirone(m) {
 
   const glHtml = (goals, side) => {
     if (!goals.length)
-      return `<div style="font-size:clamp(1.1rem,2.2vw,1.6rem);color:var(--text-dim);padding:6px 0;font-family:'Barlow Condensed',sans-serif;text-align:center">–</div>`;
+      return `<div style="font-size:clamp(1rem,2vw,1.5rem);color:var(--text-dim);padding:6px 0;font-family:'Barlow Condensed',sans-serif;text-align:center">–</div>`;
     const counts = {};
     goals.forEach(g => { counts[g.name] = (counts[g.name]||0)+1; });
     const seen = {};
@@ -2410,32 +2404,41 @@ function buildModalGirone(m) {
   };
 
   return `
-    <!-- BARRA TIMER: full-width sopra le colonne -->
-    <div class="mm-timer-bar">
-      <div class="mm-timer-bar-top">
+    <!-- HEADER ROW: home | timer | away -->
+    <div class="mm-header-row">
+      <div class="mm-team-header-col">
+        ${teamBlockXl(m.home)}
+      </div>
+      <div class="mm-header-center">
         ${badge}
         <div class="mm-period-label" id="mm-period-label">1° Tempo</div>
         <div class="mm-clock" id="mm-clock">25:00</div>
         <div class="mm-overtime-label" id="mm-overtime-label">⏱ Recupero</div>
+        <div class="mm-timer-controls mm-controls-group">
+          <button class="mm-timer-btn start"     onclick="timerStart()">▶ Avvia</button>
+          <button class="mm-timer-btn pause"     onclick="timerPause()">⏸ Pausa</button>
+          <button class="mm-timer-btn reset-btn" onclick="timerReset()">↺ Reset</button>
+          <button class="mm-timer-btn active-period" id="mm-btn-p1" onclick="setPeriod(1,'girone')">1° T</button>
+          <button class="mm-timer-btn" id="mm-btn-p2" onclick="setPeriod(2,'girone')">2° T</button>
+        </div>
       </div>
-      <div class="mm-timer-controls mm-controls-group">
-        <button class="mm-timer-btn start"     onclick="timerStart()">▶ Avvia</button>
-        <button class="mm-timer-btn pause"     onclick="timerPause()">⏸ Pausa</button>
-        <button class="mm-timer-btn reset-btn" onclick="timerReset()">↺ Reset</button>
-        <button class="mm-timer-btn active-period" id="mm-btn-p1" onclick="setPeriod(1,'girone')">1° Tempo</button>
-        <button class="mm-timer-btn" id="mm-btn-p2" onclick="setPeriod(2,'girone')">2° Tempo</button>
+      <div class="mm-team-header-col">
+        ${teamBlockXl(m.away)}
       </div>
     </div>
 
-    <!-- CORPO: 2 COLONNE -->
-    <div class="mm-body-2col">
+    <!-- RIGA PUNTEGGI -->
+    <div class="mm-score-row">
+      <input class="mm-col-score-inp mm-controls-group" type="number" min="0" max="99"
+        id="mm-sh-${m.id}" value="${shVal}" placeholder="0">
+      <span class="mm-score-dash">–</span>
+      <input class="mm-col-score-inp mm-controls-group" type="number" min="0" max="99"
+        id="mm-sa-${m.id}" value="${saVal}" placeholder="0">
+    </div>
 
-      <!-- COLONNA SINISTRA: home -->
-      <div class="mm-col-half">
-        ${teamBlockXl(m.home)}
-        <input class="mm-col-score-inp mm-controls-group" type="number" min="0" max="99"
-          id="mm-sh-${m.id}" value="${shVal}" placeholder="0">
-        <div class="mm-col-divider"></div>
+    <!-- RIGA MARCATORI -->
+    <div class="mm-scorers-row">
+      <div class="mm-scorers-col">
         <div class="mm-scorers-xl">${glHtml(homeGoals,'home')}</div>
         <div class="mm-add-row-xl mm-controls-group">
           <input class="mm-add-inp-xl" type="text" id="mm-inp-home-${m.id}" placeholder="Aggiungi marcatore"
@@ -2443,13 +2446,7 @@ function buildModalGirone(m) {
           <button class="mm-add-btn-xl" onclick="mmAddGoal(${m.id},'home')">+</button>
         </div>
       </div>
-
-      <!-- COLONNA DESTRA: away -->
-      <div class="mm-col-half">
-        ${teamBlockXl(m.away)}
-        <input class="mm-col-score-inp mm-controls-group" type="number" min="0" max="99"
-          id="mm-sa-${m.id}" value="${saVal}" placeholder="0">
-        <div class="mm-col-divider"></div>
+      <div class="mm-scorers-col">
         <div class="mm-scorers-xl">${glHtml(awayGoals,'away')}</div>
         <div class="mm-add-row-xl mm-controls-group">
           <input class="mm-add-inp-xl" type="text" id="mm-inp-away-${m.id}" placeholder="Aggiungi marcatore"
@@ -2459,7 +2456,7 @@ function buildModalGirone(m) {
       </div>
     </div>
 
-    <!-- BARRA AZIONI in fondo -->
+    <!-- BARRA AZIONI -->
     <div class="mm-actions-bar mm-controls-group">
       <button class="mm-save-btn" style="min-width:160px" onclick="mmSaveGirone(${m.id})">💾 Salva risultato</button>
       ${m.isFinal
@@ -2498,7 +2495,7 @@ function buildModalKnockout(key, bm, slot) {
 
   const glHtml = (goals, bkey, side) => {
     if (!goals.length)
-      return `<div style="font-size:clamp(1.1rem,2.2vw,1.6rem);color:var(--text-dim);padding:6px 0;font-family:'Barlow Condensed',sans-serif;text-align:center">–</div>`;
+      return `<div style="font-size:clamp(1rem,2vw,1.5rem);color:var(--text-dim);padding:6px 0;font-family:'Barlow Condensed',sans-serif;text-align:center">–</div>`;
     const counts = {};
     goals.forEach(g => { counts[g.name] = (counts[g.name]||0)+1; });
     const seen = {};
@@ -2510,76 +2507,82 @@ function buildModalKnockout(key, bm, slot) {
       return `<div class="mm-goal-entry-xl">
         <span class="mm-goal-balls-xl">${balls}</span>
         <input class="mm-goal-inp-xl" type="text" value="${escHtml(g.name)}"
-          data-bk="${bkey}" data-idx="${gi}"
-          onblur="mmKoRenameGoal(this)"
+          data-bkey="${bkey}" data-idx="${gi}" data-side="${side}"
+          onblur="mmRenameKoGoal(this)"
           onkeydown="if(event.key==='Enter')this.blur()">
-        <button class="mm-goal-del-xl mm-controls-group" onclick="mmKoRemoveGoal('${bkey}',${gi})">✕</button>
+        <button class="mm-goal-del-xl mm-controls-group" onclick="mmRemoveKoGoal('${bkey}',${gi})">✕</button>
       </div>`;
     }).join('');
   };
 
-  const homePen = isDraw ? `
-    <div class="mm-col-pen-row mm-controls-group">
-      <div class="mm-col-pen-label">Rig.</div>
-      <input class="mm-col-pen-inp" type="number" min="0" max="99" id="mm-ph-${key}"
-        value="${bm.penHome !== null ? bm.penHome : ''}" placeholder="0">
+  const penSection = (isDraw && !bm.isFinal) ? `
+    <div class="mm-col-pen-row">
+      <span class="mm-col-pen-label">Rig.</span>
+      <input class="mm-col-pen-inp mm-controls-group" type="number" min="0" max="99"
+        id="mm-kph-${key}" value="${bm.penHome??''}" placeholder="–">
     </div>` : '';
-  const awayPen = isDraw ? `
-    <div class="mm-col-pen-row mm-controls-group">
-      <div class="mm-col-pen-label">Rig.</div>
-      <input class="mm-col-pen-inp" type="number" min="0" max="99" id="mm-pa-${key}"
-        value="${bm.penAway !== null ? bm.penAway : ''}" placeholder="0">
+  const penSectionAway = (isDraw && !bm.isFinal) ? `
+    <div class="mm-col-pen-row">
+      <span class="mm-col-pen-label">Rig.</span>
+      <input class="mm-col-pen-inp mm-controls-group" type="number" min="0" max="99"
+        id="mm-kpa-${key}" value="${bm.penAway??''}" placeholder="–">
     </div>` : '';
 
   return `
-    <!-- BARRA TIMER -->
-    <div class="mm-timer-bar">
-      <div class="mm-timer-bar-top">
+    <!-- HEADER ROW: home | timer | away -->
+    <div class="mm-header-row">
+      <div class="mm-team-header-col">
+        ${teamBlockXl(homeName)}
+      </div>
+      <div class="mm-header-center">
         ${badge}
         <div class="mm-period-label" id="mm-period-label">1° Tempo</div>
-        <div class="mm-clock" id="mm-clock">30:00</div>
+        <div class="mm-clock" id="mm-clock">25:00</div>
         <div class="mm-overtime-label" id="mm-overtime-label">⏱ Recupero</div>
+        <div class="mm-timer-controls mm-controls-group">
+          <button class="mm-timer-btn start"     onclick="timerStart()">▶ Avvia</button>
+          <button class="mm-timer-btn pause"     onclick="timerPause()">⏸ Pausa</button>
+          <button class="mm-timer-btn reset-btn" onclick="timerReset()">↺ Reset</button>
+          <button class="mm-timer-btn active-period" id="mm-btn-p1" onclick="setPeriod(1,'ko')">1° T</button>
+          <button class="mm-timer-btn" id="mm-btn-p2" onclick="setPeriod(2,'ko')">2° T</button>
+        </div>
       </div>
-      <div class="mm-timer-controls mm-controls-group">
-        <button class="mm-timer-btn start"     onclick="timerStart()">▶ Avvia</button>
-        <button class="mm-timer-btn pause"     onclick="timerPause()">⏸ Pausa</button>
-        <button class="mm-timer-btn reset-btn" onclick="timerReset()">↺ Reset</button>
-        <button class="mm-timer-btn active-period" id="mm-btn-p1" onclick="setPeriod(1,'knockout')">1° Tempo</button>
-        <button class="mm-timer-btn" id="mm-btn-p2" onclick="setPeriod(2,'knockout')">2° Tempo</button>
-        <button class="mm-timer-btn" id="mm-btn-supp" onclick="setPeriod('supp','knockout')">⚡ Suppl.</button>
+      <div class="mm-team-header-col">
+        ${teamBlockXl(awayName)}
       </div>
     </div>
 
-    <!-- CORPO: 2 COLONNE -->
-    <div class="mm-body-2col">
-
-      <!-- COLONNA SINISTRA: home -->
-      <div class="mm-col-half">
-        ${teamBlockXl(homeName)}
+    <!-- RIGA PUNTEGGI -->
+    <div class="mm-score-row">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.2rem">
         <input class="mm-col-score-inp mm-controls-group" type="number" min="0" max="99"
           id="mm-ksh-${key}" value="${kshVal}" placeholder="0">
-        ${homePen}
-        <div class="mm-col-divider"></div>
-        <div class="mm-scorers-xl">${glHtml(homeGoals, key, 'home')}</div>
-        <div class="mm-add-row-xl mm-controls-group">
-          <input class="mm-add-inp-xl" type="text" id="mm-kinp-home-${key}" placeholder="Aggiungi marcatore"
-            onkeydown="if(event.key==='Enter')mmKoAddGoal('${key}','home')">
-          <button class="mm-add-btn-xl" onclick="mmKoAddGoal('${key}','home')">+</button>
-        </div>
+        ${penSection}
       </div>
-
-      <!-- COLONNA DESTRA: away -->
-      <div class="mm-col-half">
-        ${teamBlockXl(awayName)}
+      <span class="mm-score-dash">–</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.2rem">
         <input class="mm-col-score-inp mm-controls-group" type="number" min="0" max="99"
           id="mm-ksa-${key}" value="${ksaVal}" placeholder="0">
-        ${awayPen}
-        <div class="mm-col-divider"></div>
-        <div class="mm-scorers-xl">${glHtml(awayGoals, key, 'away')}</div>
+        ${penSectionAway}
+      </div>
+    </div>
+
+    <!-- RIGA MARCATORI -->
+    <div class="mm-scorers-row">
+      <div class="mm-scorers-col">
+        <div class="mm-scorers-xl">${glHtml(homeGoals,key,'home')}</div>
         <div class="mm-add-row-xl mm-controls-group">
-          <input class="mm-add-inp-xl" type="text" id="mm-kinp-away-${key}" placeholder="Aggiungi marcatore"
-            onkeydown="if(event.key==='Enter')mmKoAddGoal('${key}','away')">
-          <button class="mm-add-btn-xl" onclick="mmKoAddGoal('${key}','away')">+</button>
+          <input class="mm-add-inp-xl" type="text" id="mm-ko-inp-home-${key}" placeholder="Aggiungi marcatore"
+            onkeydown="if(event.key==='Enter')mmAddKoGoal('${key}','home')">
+          <button class="mm-add-btn-xl" onclick="mmAddKoGoal('${key}','home')">+</button>
+        </div>
+      </div>
+      <div class="mm-scorers-col">
+        <div class="mm-scorers-xl">${glHtml(awayGoals,key,'away')}</div>
+        <div class="mm-add-row-xl mm-controls-group">
+          <input class="mm-add-inp-xl" type="text" id="mm-ko-inp-away-${key}" placeholder="Aggiungi marcatore"
+            onkeydown="if(event.key==='Enter')mmAddKoGoal('${key}','away')">
+          <button class="mm-add-btn-xl" onclick="mmAddKoGoal('${key}','away')">+</button>
         </div>
       </div>
     </div>
@@ -2595,30 +2598,6 @@ function buildModalKnockout(key, bm, slot) {
     </div>`;
 }
 
-
-// ── Azioni dal modal GIRONE ─────────────
-function mmAddGoal(matchId, side) {
-  const inp  = document.getElementById(`mm-inp-${side}-${matchId}`);
-  const name = inp ? inp.value.trim() : '';
-  if (!name) return;
-  const m = matches.find(x => x.id === matchId);
-  m.goals.push({name, side});
-  m.scoreHome = m.goals.filter(g => g.side === 'home').length;
-  m.scoreAway = m.goals.filter(g => g.side === 'away').length;
-  // Auto-sblocca: qualsiasi modifica toglie il sigillo definitivo
-  m.isFinal = false;
-  saveState(); refreshModal(); renderStandings(); renderScorers();
-}
-function mmRemoveGoal(matchId, goalIndex) {
-  const m = matches.find(x => x.id === matchId);
-  m.goals.splice(goalIndex, 1);
-  m.scoreHome = m.goals.filter(g => g.side === 'home').length;
-  m.scoreAway = m.goals.filter(g => g.side === 'away').length;
-  if (!m.goals.length) { m.scoreHome = null; m.scoreAway = null; }
-  // Auto-sblocca
-  m.isFinal = false;
-  saveState(); refreshModal(); renderStandings(); renderScorers();
-}
 function mmSaveGirone(matchId) {
   const m    = matches.find(x => x.id === matchId);
   const hVal = document.getElementById(`mm-sh-${matchId}`)?.value;
