@@ -680,9 +680,11 @@ body.light-mode .mm-timer-section{background:rgba(0,0,0,.06)}
 .qual-out {background:var(--col-out)}
 
 /* badge squadra small */
-.st-team{display:flex;align-items:center;gap:8px}
+.st-team{display:flex;align-items:center;gap:10px}
 .st-badge{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#fff;font-family:'Barlow Condensed',sans-serif}
+.st-name-block{display:flex;flex-direction:column;gap:1px}
 .st-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:var(--fs-md);text-transform:uppercase;letter-spacing:.03em}
+.st-sponsor{font-family:'Barlow Condensed',sans-serif;font-size:var(--fs-sm);font-weight:600;color:var(--gold);font-style:italic}
 .pts{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:var(--fs-lg);color:var(--gold)}
 .dr-pos{color:var(--green)}.dr-neg{color:var(--red)}.dr-zero{color:var(--text-muted)}
 
@@ -1094,9 +1096,9 @@ function mmTeamBlock(team, side) {
 }
 function teamLogoHtml(team, size, extraClass) {
   const src = TEAM_LOGOS[team];
-  const cls = 'team-logo-img ' + (extraClass||'');
-  if (!src) return `<div class="st-badge" style="background:${teamColor(team)}">${teamInitials(team)}</div>`;
-  return `<img class="${cls.trim()}" src="${src}" alt="${team}" width="${size}" height="${size}" onerror="this.outerHTML='<div class=\"st-badge\" style=\"background:${teamColor(team)}\">${teamInitials(team)}</div>'">`;
+  const cls = ('team-logo-img ' + (extraClass||'')).trim();
+  if (!src) return `<div class="st-badge" style="background:${teamColor(team)};width:${size}px;height:${size}px">${teamInitials(team)}</div>`;
+  return `<img class="${cls}" src="${src}" alt="${escHtml(team)}" width="${size}" height="${size}" style="border-radius:50%;object-fit:contain;flex-shrink:0;display:block" onerror="this.style.visibility='hidden'">`;
 }
 const escHtml      = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const BRACKET_KEYS = ['QFA','QFB','SFA','SFB','FIN'];
@@ -1265,9 +1267,11 @@ function renderStandings() {
             </div>
           </td>
           <td class="left"><div class="st-team">
-            <div class="st-badge" style="background:${teamColor(t.name)}">${teamInitials(t.name)}</div>
-            ${teamLogoHtml(t.name, 28, "st-badge-logo")}
-            <span class="st-name">${t.name}</span>
+            ${teamLogoHtml(t.name, 32, "st-badge-logo")}
+            <div class="st-name-block">
+              <span class="st-name">${t.name}</span>
+              ${SPONSORS[t.name] ? `<span class="st-sponsor">(${escHtml(SPONSORS[t.name].name)})</span>` : ''}
+            </div>
           </div></td>
           <td>${t.g}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
           <td>${t.gf}</td><td>${t.ga}</td>
@@ -1328,8 +1332,7 @@ function renderScorers() {
   root.innerHTML = sorted.map((s,i) => `
     <div class="scorer-row">
       <span class="scorer-pos ${posClass(i)}">${i+1}</span>
-      <div class="scorer-badge" style="background:${teamColor(s.team)}">${teamInitials(s.team)}</div>
-      ${teamLogoHtml(s.team, 28, "scorer-badge-logo")}
+      ${teamLogoHtml(s.team, 34, "scorer-badge-logo")}
       <div class="scorer-info">
         <div class="scorer-name">${escHtml(s.name)}</div>
         <div class="scorer-team">${s.team}</div>
@@ -1398,7 +1401,6 @@ function renderBracket() {
     if (isWinner) cls.push('winner');
     if (isLoser)  cls.push('loser');
     return `<div class="${cls.join(' ')}">
-      <div class="bk-slot-badge" style="background:${has?teamColor(team):'#444'}">${teamInitials(team||'')}</div>
       ${has ? teamLogoHtml(team, 32, "bk-slot-badge-logo") : '<div class="bk-slot-badge" style="background:#444">?</div>'}
       <span class="bk-slot-name">${has?escHtml(team):'Da definire'}</span>
       ${penScore!==null&&penScore!==undefined?`<span class="bk-slot-pen">(${penScore})</span>`:''}
