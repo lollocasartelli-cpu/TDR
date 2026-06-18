@@ -243,12 +243,13 @@ nav::-webkit-scrollbar{display:none}
 .modal-score-mob{font-family:'Barlow Condensed',sans-serif;font-size:clamp(3rem,14vw,5.5rem);font-weight:900;line-height:1;color:var(--text)}
 .modal-score-mob-tbd{font-family:'Barlow Condensed',sans-serif;font-size:clamp(1.5rem,8vw,3rem);font-weight:700;color:var(--text-dim);line-height:1}
 
-/* RIGA 3: badge stato + rigori */
+/* RIGA 3: badge stato + rigori — occupa entrambe le colonne */
 .modal-cell-badge{
   display:flex;align-items:center;justify-content:center;
   padding:.1rem .4rem .2rem;
   gap:.3rem;flex-wrap:wrap;
 }
+.modal-cell-badge-full{grid-column:1/-1;}
 .modal-live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(224,60,60,.15);border:1px solid rgba(224,60,60,.3);border-radius:12px;padding:2px 7px;font-family:'Barlow Condensed',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#ff6b6b;animation:livepulse 1.2s ease-in-out infinite}
 .modal-status-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
 .modal-status-final{background:rgba(201,168,76,.15);color:var(--gold)}
@@ -1066,9 +1067,9 @@ function buildModalGrid(home, away, scoreHome, scoreAway, penHome, penAway, isFi
     return `<div class="modal-cell modal-cell-score">${el}</div>`;
   };
 
-  const badgeCell = (side) => {
-    const penEl = (isDraw && side==='home') ? `<div class="modal-pen">Rig. ${penHome}–${penAway}</div>` : '';
-    return `<div class="modal-cell modal-cell-badge">${badge()}${penEl}</div>`;
+  const badgeCell = () => {
+    const penEl = isDraw ? `<div class="modal-pen">Rig. ${penHome}–${penAway}</div>` : '';
+    return `<div class="modal-cell modal-cell-badge modal-cell-badge-full">${badge()}${penEl}</div>`;
   };
 
   const goalsCell = (goals) =>
@@ -1079,7 +1080,7 @@ function buildModalGrid(home, away, scoreHome, scoreAway, penHome, penAway, isFi
   return `
     ${headerCell(home)}   ${headerCell(away)}
     ${scoreCell(scoreHome)} ${scoreCell(scoreAway)}
-    ${badgeCell('home')}  ${badgeCell('away')}
+    ${badgeCell()}
     ${goalsCell(homeGoals)} ${goalsCell(awayGoals)}`;
 }
 
