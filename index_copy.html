@@ -201,55 +201,49 @@ nav::-webkit-scrollbar{display:none}
 .sponsor-logo-placeholder{font-size:22px;color:var(--text-dim)}
 
 /* ── MODAL ── */
-#match-modal{position:fixed;inset:0;background:var(--modal-overlay);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+/* ── MODAL FULL-SCREEN MOBILE ── */
+#match-modal{position:fixed;inset:0;z-index:500;display:none;flex-direction:column;background:var(--bg);overflow:hidden}
 #match-modal.open{display:flex}
-.modal-box{background:var(--bg-card);border:1px solid var(--border-strong);border-radius:14px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.6);position:relative}
-.modal-header{padding:.85rem 1rem .6rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg-card);border-radius:14px 14px 0 0;z-index:1}
-.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)}
-.modal-close{background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:6px;transition:color .15s,background .15s}
-.modal-close:hover{color:var(--text);background:rgba(201,168,76,.1)}
-.modal-time-row{text-align:center;padding:.5rem 1rem;border-bottom:1px solid var(--border);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
-/* 3-column grid */
-.modal-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0;padding:.9rem .75rem 1rem}
-.modal-col{display:flex;flex-direction:column;gap:.5rem;min-width:0}
-.modal-col-center{align-items:center;justify-content:center;gap:.4rem;padding:0 .5rem}
-/* team header nel modal */
-.modal-team-header{display:flex;flex-direction:column;gap:0}
-.modal-th-row{display:flex;align-items:center;gap:7px;min-width:0;flex:1}
-.modal-th-team-logo{width:36px;height:36px;object-fit:contain;border-radius:50%;flex-shrink:0}
-.modal-th-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
-.modal-th-team-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.modal-th-sp-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--sponsor-color);letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* right column: specchiato */
-.modal-col:last-child .modal-th-row{flex-direction:row-reverse}
-.modal-col:last-child .modal-th-text{align-items:flex-end}
-.modal-col:last-child .modal-th-team-name{text-align:right}
-.modal-col:last-child .modal-th-sp-name{text-align:right}
-/* se una colonna non ha sponsor, il modal-goal-list parte comunque alla stessa altezza dell'altra */
-.modal-col{display:flex;flex-direction:column;gap:.5rem;min-width:0}
-/* scorers */
-.modal-goal-list{display:flex;flex-direction:column;gap:2px}
-.modal-goal-entry{display:flex;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
-.modal-goal-ball{font-size:10px;flex-shrink:0;color:var(--gold)}
-.modal-empty{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text-dim)}
-.modal-col:last-child .modal-goal-entry{flex-direction:row-reverse;text-align:right}
-/* center col */
-.modal-live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(224,60,60,.15);border:1px solid rgba(224,60,60,.3);border-radius:12px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#ff6b6b;animation:livepulse 1.2s ease-in-out infinite}
-.modal-score{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:900;letter-spacing:.06em;color:var(--text);line-height:1}
-.modal-score-sep{color:var(--text-muted);font-weight:400}
-.modal-score-tbd{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--text-dim);letter-spacing:.08em}
-.modal-status{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
-.modal-pen{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.06em}
-.modal-status-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.modal-box{display:flex;flex-direction:column;width:100vw;height:100vh;max-width:none;max-height:none;border-radius:0;border:none;background:var(--bg);overflow:hidden}
+/* topbar compatta */
+.modal-header{padding:.55rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:rgba(201,168,76,.04)}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim)}
+.modal-close{background:none;border:1px solid var(--border);color:var(--text-muted);font-size:1.2rem;cursor:pointer;line-height:1;padding:3px 8px;border-radius:8px;transition:color .15s,border-color .15s}
+.modal-close:hover{color:var(--text);border-color:var(--gold)}
+.modal-time-row{text-align:center;padding:.3rem .75rem;font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);flex-shrink:0}
+/* griglia 2 colonne uguali */
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0;overflow:hidden;border-top:1px solid var(--border)}
+/* colonna generica */
+.modal-col-mob{display:flex;flex-direction:column;align-items:center;text-align:center;padding:.8rem .6rem .6rem;overflow:hidden;min-width:0}
+.modal-col-mob:first-child{border-right:1px solid var(--border)}
+/* logo squadra */
+.modal-logo-mob{width:clamp(52px,14vw,90px);height:clamp(52px,14vw,90px);object-fit:contain;border-radius:50%;flex-shrink:0;display:block;margin-bottom:.3rem}
+.modal-logo-mob-placeholder{width:clamp(52px,14vw,90px);height:clamp(52px,14vw,90px);flex-shrink:0}
+/* nome squadra */
+.modal-name-mob{font-family:'Barlow Condensed',sans-serif;font-size:clamp(1.3rem,5.5vw,2rem);font-weight:900;text-transform:uppercase;letter-spacing:.03em;line-height:1.05;color:var(--text);white-space:normal;overflow-wrap:break-word;word-break:break-word;margin-bottom:.1rem}
+/* nome sponsor */
+.modal-sp-mob{font-family:'Barlow Condensed',sans-serif;font-size:clamp(.75rem,2.8vw,1rem);font-weight:700;text-transform:uppercase;color:var(--sponsor-color);letter-spacing:.04em;white-space:normal;overflow-wrap:break-word;word-break:break-word;margin-bottom:.3rem}
+/* punteggio grande */
+.modal-score-mob{font-family:'Barlow Condensed',sans-serif;font-size:clamp(4rem,18vw,7rem);font-weight:900;line-height:1;color:var(--text);margin-bottom:.15rem}
+.modal-score-mob-tbd{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,10vw,4rem);font-weight:700;color:var(--text-dim);line-height:1;margin-bottom:.15rem}
+/* badge stato */
+.modal-badge-row{display:flex;align-items:center;justify-content:center;gap:.4rem;margin-bottom:.3rem;flex-shrink:0}
+.modal-live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(224,60,60,.15);border:1px solid rgba(224,60,60,.3);border-radius:12px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#ff6b6b;animation:livepulse 1.2s ease-in-out infinite}
+.modal-status-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
 .modal-status-final{background:rgba(201,168,76,.15);color:var(--gold)}
 .modal-status-upcoming{background:rgba(90,88,85,.2);color:var(--text-dim)}
+/* rigori */
+.modal-pen{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;color:var(--gold);letter-spacing:.06em;margin-bottom:.2rem}
+/* lista marcatori */
+.modal-goal-list-mob{display:flex;flex-direction:column;gap:3px;width:100%;flex:1;overflow-y:auto}
+.modal-goal-entry-mob{display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:clamp(.8rem,3vw,1rem);font-weight:700;color:var(--text);line-height:1.3}
+.modal-goal-ball-mob{font-size:.75rem;flex-shrink:0;color:var(--gold)}
+.modal-empty-mob{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--text-dim)}
 
 @media(max-width:460px){
   .team-name{font-size:11px}
   .match-card{padding:1.9rem .6rem .65rem}
-  .modal-score{font-size:1.7rem}
-  .modal-th-team-name{font-size:11px}
-  .modal-grid{padding:.7rem .5rem .9rem}
+
 }
 </style>
 </head>
@@ -991,73 +985,58 @@ function buildKnockoutBlock(slot) {
 // ═══════════════════════════════════════
 //  MODAL
 // ═══════════════════════════════════════
-function buildTeamHeader(team) {
-  // Mostra logo e sponsor solo se il nome è una squadra reale del torneo
-  const real = isRealTeam(team);
-  const sp  = real ? SPONSORS[team] : null;
-  const src = real ? TEAM_LOGOS[team] : null;
-  const logoEl = real
-    ? (src ? `<img class="modal-th-team-logo" src="${src}" alt="${escHtml(team)}" onerror="this.style.visibility='hidden'">` : `<div style="width:36px;height:36px;flex-shrink:0"></div>`)
-    : '';
-  // Riga sponsor: visibile solo se presente (niente placeholder invisibile che altera l'altezza)
-  const spEl = sp
-    ? `<span class="modal-th-sp-name js-fit" data-max-fs="13" data-min-fs="8">(${escHtml(sp.name)})</span>`
-    : '';
-  return `<div class="modal-team-header">
-    <div class="modal-th-row">
-      ${logoEl}
-      <div class="modal-th-text">
-        <span class="modal-th-team-name js-fit" data-max-fs="13" data-min-fs="8">${escHtml(team||'—')}</span>
-        ${spEl}
-      </div>
-    </div>
-  </div>`;
-}
-
 function buildModalGrid(home, away, scoreHome, scoreAway, penHome, penAway, isFinal, goals) {
   const hasScore = scoreHome !== null && scoreHome !== undefined;
   const isDraw   = hasScore && scoreHome === scoreAway && penHome !== null;
   const isLive   = hasScore && !isFinal;
 
-  let centerContent = '';
-  if (isLive) centerContent += `<div class="modal-live-badge"><span class="live-dot"></span>LIVE</div>`;
-  if (hasScore) {
-    centerContent += `<div class="modal-score"><span>${scoreHome}</span><span class="modal-score-sep"> – </span><span>${scoreAway}</span></div>`;
-    if (isDraw) centerContent += `<div class="modal-pen">Rig: ${penHome} – ${penAway}</div>`;
-    if (isFinal) centerContent += `<span class="modal-status-badge modal-status-final">Finale</span>`;
-    else         centerContent += `<div class="modal-status">In corso</div>`;
-  } else {
-    centerContent += `<div class="modal-score-tbd">VS</div>`;
-    centerContent += `<span class="modal-status-badge modal-status-upcoming">In arrivo</span>`;
-  }
+  const statusBadge = () => {
+    if (!hasScore) return `<span class="modal-status-badge modal-status-upcoming">In arrivo</span>`;
+    if (isFinal)   return `<span class="modal-status-badge modal-status-final">Finale</span>`;
+    return `<div class="modal-live-badge"><span class="live-dot"></span>LIVE</div>`;
+  };
 
   const homeGoals = (goals||[]).filter(g=>g.side==='home');
   const awayGoals = (goals||[]).filter(g=>g.side==='away');
-  // Raggruppa marcatori: stesso nome → una riga con tanti palloni quanti i gol
   const groupGoals = list => {
     const map = {};
-    list.forEach(g => { map[g.name] = (map[g.name]||0) + 1; });
+    list.forEach(g => { map[g.name] = (map[g.name]||0)+1; });
     return Object.entries(map);
   };
   const goalsHtml = list => {
     const grouped = groupGoals(list);
     return grouped.length
       ? grouped.map(([name, count]) =>
-          `<div class="modal-goal-entry"><span class="modal-goal-ball">${'⚽'.repeat(count)}</span><span>${escHtml(name)}</span></div>`
+          `<div class="modal-goal-entry-mob"><span class="modal-goal-ball-mob">${'⚽'.repeat(count)}</span><span>${escHtml(name)}</span></div>`
         ).join('')
-      : `<div class="modal-empty">–</div>`;
+      : `<div class="modal-empty-mob">–</div>`;
   };
 
-  return `
-    <div class="modal-col">
-      ${buildTeamHeader(home)}
-      <div class="modal-goal-list">${goalsHtml(homeGoals)}</div>
-    </div>
-    <div class="modal-col modal-col-center">${centerContent}</div>
-    <div class="modal-col">
-      ${buildTeamHeader(away)}
-      <div class="modal-goal-list">${goalsHtml(awayGoals)}</div>
+  const colHtml = (team, score, goals, side) => {
+    const real   = isRealTeam(team);
+    const sp     = real ? SPONSORS[team] : null;
+    const src    = real ? TEAM_LOGOS[team] : null;
+    const logoEl = src
+      ? `<img class="modal-logo-mob" src="${src}" alt="${escHtml(team)}" onerror="this.style.visibility='hidden'">`
+      : `<div class="modal-logo-mob-placeholder"></div>`;
+    const scoreEl = hasScore
+      ? `<div class="modal-score-mob">${score}</div>`
+      : `<div class="modal-score-mob-tbd">–</div>`;
+    const penEl = isDraw
+      ? `<div class="modal-pen">Rig: ${side==='home'?penHome:penAway}</div>`
+      : '';
+    return `<div class="modal-col-mob">
+      ${logoEl}
+      <div class="modal-name-mob">${escHtml(team||'—')}</div>
+      ${sp ? `<div class="modal-sp-mob">${escHtml(sp.name)}</div>` : ''}
+      ${scoreEl}
+      ${penEl}
+      <div class="modal-badge-row">${statusBadge()}</div>
+      <div class="modal-goal-list-mob">${goalsHtml(goals)}</div>
     </div>`;
+  };
+
+  return colHtml(home, scoreHome, homeGoals, 'home') + colHtml(away, scoreAway, awayGoals, 'away');
 }
 
 function openGironeModal(matchId) {
