@@ -219,15 +219,13 @@ nav::-webkit-scrollbar{display:none}
   grid-template-rows:auto auto auto 1fr;
   flex:1;min-height:0;overflow:hidden;
 }
-/* Cella generica — bordo sinistro sulla colonna destra (col 2) */
+/* Cella generica */
 .modal-cell{min-width:0;overflow:hidden}
-.modal-cell:nth-child(even){border-left:1px solid var(--border)}
 
 /* RIGA 1: intestazione (logo + nome + sponsor) */
 .modal-cell-header{
   display:flex;flex-direction:column;align-items:center;text-align:center;
   padding:.6rem .5rem .25rem;
-  border-bottom:1px solid rgba(255,255,255,.06);
 }
 /* logo squadra */
 .modal-logo-mob{width:clamp(40px,11vw,72px);height:clamp(40px,11vw,72px);object-fit:contain;border-radius:50%;flex-shrink:0;display:block;margin-bottom:.25rem}
@@ -271,9 +269,9 @@ nav::-webkit-scrollbar{display:none}
 .modal-pen{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;color:var(--gold);letter-spacing:.06em;margin-bottom:.2rem}
 /* lista marcatori */
 .modal-goal-list-mob{display:flex;flex-direction:column;gap:3px;width:100%;flex:1;overflow-y:auto}
-.modal-goal-entry-mob{display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:clamp(.8rem,3vw,1rem);font-weight:700;color:var(--text);line-height:1.3}
-.modal-goal-ball-mob{font-size:.75rem;flex-shrink:0;color:var(--gold)}
-.modal-empty-mob{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--text-dim)}
+.modal-goal-entry-mob{display:flex;align-items:center;justify-content:flex-start;gap:4px;font-family:'Barlow Condensed',sans-serif;font-size:clamp(.85rem,3.2vw,1.05rem);font-weight:700;color:var(--text);line-height:1.3;text-align:left}
+.modal-goal-ball-mob{font-size:.78rem;flex-shrink:0;color:var(--gold)}
+.modal-empty-mob{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--text-dim);text-align:left}
 
 @media(max-width:460px){
   .team-name{font-size:11px}
