@@ -748,8 +748,8 @@ function seedBracket() {
 
   // ── SLOT DIRETTI IN SEMIFINALE (1ª e 2ª dai gironi) ──
   if (gc) {
-    bracket.SFA.away = get(0); // 1ª classificata → SFA away
-    bracket.SFB.away = get(1); // 2ª classificata → SFB away
+    bracket.SFA.away = get(1); // 2ª classificata → SFA away (vs vincente QFA)
+    bracket.SFB.away = get(0); // 1ª classificata → SFB away (vs vincente QFB)
   } else {
     if (!bracket.SFA.winner) bracket.SFA.away = null;
     if (!bracket.SFB.winner) bracket.SFB.away = null;
@@ -870,19 +870,19 @@ function getKnockoutCalendarSlots() {
   const ph = (name, fallback) => name || fallback;
   return [
     // QUARTI (slot disponibili solo dopo chiusura gironi)
-    { day:'Mar 23 Giugno', time:'21:00', label:'Quarto di Finale A', bracketKey:'QFA',
+    { day:'Mar 23 Giugno', time:'20:45', label:'Quarto di Finale A', bracketKey:'QFA',
       calHome: ph(bracket.QFA.home, '3ª Classificata'),
       calAway: ph(bracket.QFA.away, '6ª Classificata') },
-    { day:'Mar 23 Giugno', time:'22:00', label:'Quarto di Finale B', bracketKey:'QFB',
+    { day:'Mar 23 Giugno', time:'21:45', label:'Quarto di Finale B', bracketKey:'QFB',
       calHome: ph(bracket.QFB.home, '4ª Classificata'),
       calAway: ph(bracket.QFB.away, '5ª Classificata') },
-    // SEMIFINALI: away = 1ª/2ª (dopo gironi), home = vincente quarto (match-by-match)
-    { day:'Gio 25 Giugno', time:'21:00', label:'Semifinale A', bracketKey:'SFA',
+    // SEMIFINALI: away = 2ª/1ª (dopo gironi), home = vincente quarto (match-by-match)
+    { day:'Gio 25 Giugno', time:'21:45', label:'Semifinale A', bracketKey:'SFA',
       calHome: ph(bracket.SFA.home, 'Vincente Quarto A'),
-      calAway: ph(bracket.SFA.away, '1ª Classificata') },
-    { day:'Gio 25 Giugno', time:'22:00', label:'Semifinale B', bracketKey:'SFB',
+      calAway: ph(bracket.SFA.away, '2ª Classificata') },
+    { day:'Gio 25 Giugno', time:'20:45', label:'Semifinale B', bracketKey:'SFB',
       calHome: ph(bracket.SFB.home, 'Vincente Quarto B'),
-      calAway: ph(bracket.SFB.away, '2ª Classificata') },
+      calAway: ph(bracket.SFB.away, '1ª Classificata') },
     // FINALE: compilata man mano che le semi si chiudono
     { day:'Ven 26 Giugno', time:'22:00', label:'Finale 1°/2° Posto', bracketKey:'FIN',
       calHome: ph(bracket.FIN.home, 'Vincente Semi A'),
