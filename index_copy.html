@@ -430,7 +430,7 @@ const SPONSORS = {
 };
 const ALL_TEAMS = ['San Carlo','Castello','Monterotondo','Colombaio','Madonnina',
                    'Borgo','Benedetta','Malpaga','Ex Residenti','Stazione'];
-const BRACKET_KEYS = ['QFA','QFB','SFA','SFB','FIN'];
+const BRACKET_KEYS = ['QFA','QFB','SFA','SFB','TER','FIN'];
 
 const teamColor    = t => TEAM_COLORS[t] || '#666';
 const teamInitials = t => t ? t.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '?';
@@ -782,6 +782,18 @@ function seedBracket() {
   } else {
     if (!bracket.FIN.winner) bracket.FIN.away = null;
   }
+
+  // ── SEMIFINALI → FINALE 3°/4° (perdenti) ──
+  if (bracket.SFA && bracket.SFA.isFinal) {
+    if (!bracket.TER.winner) bracket.TER.home = computeWinner(bracket.SFA) === bracket.SFA.home ? bracket.SFA.away : bracket.SFA.home;
+  } else {
+    if (!bracket.TER.winner) bracket.TER.home = null;
+  }
+  if (bracket.SFB && bracket.SFB.isFinal) {
+    if (!bracket.TER.winner) bracket.TER.away = computeWinner(bracket.SFB) === bracket.SFB.home ? bracket.SFB.away : bracket.SFB.home;
+  } else {
+    if (!bracket.TER.winner) bracket.TER.away = null;
+  }
 }
 
 // Helper: true se il nome è una squadra reale (non un placeholder)
@@ -883,8 +895,11 @@ function getKnockoutCalendarSlots() {
     { day:'Gio 25 Giugno', time:'21:45', label:'Semifinale A', bracketKey:'SFA',
       calHome: ph(bracket.SFA.home, 'Vincente Quarto A'),
       calAway: ph(bracket.SFA.away, '2ª Classificata') },
-    // FINALE: compilata man mano che le semi si chiudono
-    { day:'Ven 26 Giugno', time:'22:00', label:'Finale 1°/2° Posto', bracketKey:'FIN',
+    // FINALI: compilate man mano che le semi si chiudono
+    { day:'Ven 26 Giugno', time:'20:45', label:'Finale 3°/4° Posto', bracketKey:'TER',
+      calHome: ph(bracket.TER.home, 'Perdente Semi A'),
+      calAway: ph(bracket.TER.away, 'Perdente Semi B') },
+    { day:'Ven 26 Giugno', time:'21:45', label:'Finale 1°/2° Posto', bracketKey:'FIN',
       calHome: ph(bracket.FIN.home, 'Vincente Semi A'),
       calAway: ph(bracket.FIN.away, 'Vincente Semi B') },
   ];
