@@ -2702,7 +2702,7 @@ function mmReopenGirone(matchId) {
 
 // ── Azioni dal modal KNOCKOUT ───────────
 function mmKoAddGoal(key, side) {
-  const inp  = document.getElementById(`mm-kinp-${side}-${key}`);
+  const inp  = document.getElementById(`mm-ko-inp-${side}-${key}`);
   const name = inp ? inp.value.trim() : '';
   if (!name) return;
   const bm = bracket[key];
