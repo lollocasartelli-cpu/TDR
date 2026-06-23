@@ -1362,7 +1362,7 @@ function teamLogoHtml(team, size, extraClass) {
   return `<img class="${cls}" src="${src}" alt="${escHtml(team)}" width="${size}" height="${size}" style="border-radius:50%;object-fit:contain;flex-shrink:0;display:block" onerror="this.style.visibility='hidden'">`;
 }
 const escHtml      = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const BRACKET_KEYS = ['QFA','QFB','SFA','SFB','FIN'];
+const BRACKET_KEYS = ['QFA','QFB','SFA','SFB','TER','FIN'];
 
 // ═══════════════════════════════════════
 //  DEFAULTS
@@ -1396,7 +1396,7 @@ let matches = JSON.parse(JSON.stringify(DEFAULT_MATCHES));
 let bracket = {
   QFA:DEFAULT_BRACKET_ENTRY(),QFB:DEFAULT_BRACKET_ENTRY(),
   SFA:DEFAULT_BRACKET_ENTRY(),SFB:DEFAULT_BRACKET_ENTRY(),
-  FIN:DEFAULT_BRACKET_ENTRY()
+  TER:DEFAULT_BRACKET_ENTRY(),FIN:DEFAULT_BRACKET_ENTRY()
 };
 
 function allGironiClosed() {
@@ -1612,21 +1612,19 @@ function seedBracket() {
   const st  = computeStandings();
   const get = i => st[i] ? st[i].name : null;
 
-  // ── Quarti: seed dalle standings solo se la partita non ha ancora un vincitore ──
+  // ── Quarti: accoppiamenti fissi ──
   if (!bracket.QFA.winner) {
-    bracket.QFA.home = get(2);
-    bracket.QFA.away = get(5);
+    bracket.QFA.home = 'San Carlo';
+    bracket.QFA.away = 'Stazione';
   }
   if (!bracket.QFB.winner) {
-    bracket.QFB.home = get(3);
-    bracket.QFB.away = get(4);
+    bracket.QFB.home = 'Benedetta';
+    bracket.QFB.away = 'Colombaio';
   }
 
-  // ── Semifinali: BYE slot (1° e 2° classificati) aggiornati sempre dalle standings ──
-  //    Il "home" (vincente quarto) avanza appena quel quarto ha un winner, indipendentemente
-  //    dallo stato degli altri quarti.
-  bracket.SFA.away = get(1);  // 2ª classificata — accesso diretto
-  bracket.SFB.away = get(0);  // 1ª classificata — accesso diretto
+  // ── Semifinali: avversari fissi ──
+  bracket.SFA.away = 'Monterotondo'; // SFA 20:45: vincente QFA vs Monterotondo
+  bracket.SFB.away = 'Madonnina';    // SFB 21:45: vincente QFB vs Madonnina
 
   // Vincente QFA → slot home SFA (immediatamente, appena QFA.winner è noto)
   if (bracket.QFA.winner) {
@@ -1642,7 +1640,13 @@ function seedBracket() {
     bracket.SFB.home = null;  // ancora da determinare
   }
 
-  // ── Finale: avanza appena la singola semifinale è chiusa, indipendentemente dall'altra ──
+  // ── Finale 3°/4°: perdenti delle semifinali ──
+  if (!bracket.TER.winner) {
+    bracket.TER.home = bracket.SFA.winner ? (bracket.SFA.winner === bracket.SFA.home ? bracket.SFA.away : bracket.SFA.home) : null;
+    bracket.TER.away = bracket.SFB.winner ? (bracket.SFB.winner === bracket.SFB.home ? bracket.SFB.away : bracket.SFB.home) : null;
+  }
+
+  // ── Finale 1°/2°: avanza appena la singola semifinale è chiusa ──
   if (!bracket.FIN.winner) {
     bracket.FIN.home = bracket.SFA.winner || null;
     bracket.FIN.away = bracket.SFB.winner || null;
@@ -1718,7 +1722,7 @@ let currentBkKey = null;
 function openBkModal(key) {
   currentBkKey = key;
   const bm = bracket[key];
-  const labels = {QFA:'Quarto di Finale A',QFB:'Quarto di Finale B',SFA:'Semifinale A',SFB:'Semifinale B',FIN:'Finale'};
+  const labels = {QFA:'Quarto di Finale A',QFB:'Quarto di Finale B',SFA:'Semifinale A',SFB:'Semifinale B',TER:'Finale 3°/4° Posto',FIN:'Finale 1°/2° Posto'};
   document.getElementById('bk-modal-title').textContent = labels[key]||key;
   const lh=document.getElementById('bk-lhome'), la=document.getElementById('bk-laway');
   lh.textContent=bm.home||'—'; lh.style.color=bm.home?teamColor(bm.home):'var(--text-muted)';
@@ -1851,41 +1855,38 @@ function getKnockoutCalendarSlots() {
   const st  = computeStandings();
   const get = i => (st[i] && st[i].name) ? st[i].name : null;
 
-  // Quarti: usa il nome reale se già seeded, altrimenti placeholder
-  const qfaHome = bracket.QFA.home || get(2) || '3ª Classificata';
-  const qfaAway = bracket.QFA.away || get(5) || '6ª Classificata';
-  const qfbHome = bracket.QFB.home || get(3) || '4ª Classificata';
-  const qfbAway = bracket.QFB.away || get(4) || '5ª Classificata';
+  // Quarti: accoppiamenti fissi
+  const qfaHome = bracket.QFA.home || 'San Carlo';
+  const qfaAway = bracket.QFA.away || 'Stazione';
+  const qfbHome = bracket.QFB.home || 'Benedetta';
+  const qfbAway = bracket.QFB.away || 'Colombaio';
 
-  // Semifinali: mostra il nome reale del vincente quarto APPENA disponibile,
-  // senza aspettare l'altro quarto o il girone intero
-  const sfaHome = bracket.SFA.home  // = winner di QFA, già propagato
-    || (bracket.QFA.winner ? bracket.QFA.winner : 'Vincente Quarto A');
-  const sfaAway = bracket.SFA.away  // = 2ª classificata (dal seeding sopra)
-    || get(1)
-    || '2ª Classificata';
-  const sfbHome = bracket.SFB.home
-    || (bracket.QFB.winner ? bracket.QFB.winner : 'Vincente Quarto B');
-  const sfbAway = bracket.SFB.away
-    || get(0)
-    || '1ª Classificata';
+  // Semifinali
+  const sfaHome = bracket.SFA.home || (bracket.QFA.winner ? bracket.QFA.winner : 'Vincente Quarto A');
+  const sfaAway = bracket.SFA.away || 'Monterotondo';
+  const sfbHome = bracket.SFB.home || (bracket.QFB.winner ? bracket.QFB.winner : 'Vincente Quarto B');
+  const sfbAway = bracket.SFB.away || 'Madonnina';
 
-  // Finale: mostra il nome reale di ogni semifinalista APPENA la sua semi è chiusa
-  const finHome = bracket.FIN.home
-    || (bracket.SFA.winner ? bracket.SFA.winner : 'Vincente Semi A');
-  const finAway = bracket.FIN.away
-    || (bracket.SFB.winner ? bracket.SFB.winner : 'Vincente Semi B');
+  // Finale 3°/4°
+  const terHome = bracket.TER.home || 'Perdente Semi A';
+  const terAway = bracket.TER.away || 'Perdente Semi B';
+
+  // Finale 1°/2°
+  const finHome = bracket.FIN.home || (bracket.SFA.winner ? bracket.SFA.winner : 'Vincente Semi A');
+  const finAway = bracket.FIN.away || (bracket.SFB.winner ? bracket.SFB.winner : 'Vincente Semi B');
 
   return [
-    { day:'Mar 23 Giugno', time:'21:00', label:'Quarto di Finale A', bracketKey:'QFA',
+    { day:'Mar 23 Giugno', time:'20:45', label:'Quarto di Finale A', bracketKey:'QFA',
       calHome: qfaHome, calAway: qfaAway },
-    { day:'Mar 23 Giugno', time:'22:00', label:'Quarto di Finale B', bracketKey:'QFB',
+    { day:'Mar 23 Giugno', time:'21:45', label:'Quarto di Finale B', bracketKey:'QFB',
       calHome: qfbHome, calAway: qfbAway },
-    { day:'Gio 25 Giugno', time:'21:00', label:'Semifinale A', bracketKey:'SFA',
+    { day:'Gio 25 Giugno', time:'20:45', label:'Semifinale A', bracketKey:'SFA',
       calHome: sfaHome, calAway: sfaAway },
-    { day:'Gio 25 Giugno', time:'22:00', label:'Semifinale B', bracketKey:'SFB',
+    { day:'Gio 25 Giugno', time:'21:45', label:'Semifinale B', bracketKey:'SFB',
       calHome: sfbHome, calAway: sfbAway },
-    { day:'Ven 26 Giugno', time:'22:00', label:'Finale 1°/2° Posto', bracketKey:'FIN',
+    { day:'Ven 26 Giugno', time:'20:45', label:'Finale 3°/4° Posto', bracketKey:'TER',
+      calHome: terHome, calAway: terAway },
+    { day:'Ven 26 Giugno', time:'21:45', label:'Finale 1°/2° Posto', bracketKey:'FIN',
       calHome: finHome, calAway: finAway },
   ];
 }
@@ -2275,8 +2276,8 @@ let currentMatchType = 'girone'; // 'girone' | 'knockout'
 
 // Secondi di partenza per ogni tipo + periodo
 function timerStartSeconds(type, period) {
-  if (period === 'supp') return 7 * 60;   // supplementari: 7 min
-  return type === 'girone' ? 25 * 60 : 30 * 60; // girone 25, knockout 30
+  if (period === 'supp') return 10 * 60;  // supplementari: 10 min
+  return type === 'girone' ? 25 * 60 : 25 * 60; // girone 25, knockout 25
 }
 
 function timerFormat(secs) {
