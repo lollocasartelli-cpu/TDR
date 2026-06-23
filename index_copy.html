@@ -736,15 +736,9 @@ function seedBracket() {
   const st = gc ? computeStandings() : [];
   const get = i => st[i] ? st[i].name : null;
 
-  // ── QUARTI ──
-  // Slot compilati solo dopo chiusura gironi; il winner blocca la riscrittura
-  if (gc) {
-    if (!bracket.QFA.winner) { bracket.QFA.home = get(2); bracket.QFA.away = get(5); }
-    if (!bracket.QFB.winner) { bracket.QFB.home = get(3); bracket.QFB.away = get(4); }
-  } else {
-    if (!bracket.QFA.winner) { bracket.QFA.home = null; bracket.QFA.away = null; }
-    if (!bracket.QFB.winner) { bracket.QFB.home = null; bracket.QFB.away = null; }
-  }
+  // ── QUARTI ── (accoppiamenti fissi)
+  if (!bracket.QFA.winner) { bracket.QFA.home = 'Stazione'; bracket.QFA.away = 'San Carlo'; }
+  if (!bracket.QFB.winner) { bracket.QFB.home = 'Benedetta'; bracket.QFB.away = 'Colombaio'; }
 
   // ── SLOT DIRETTI IN SEMIFINALE (1ª e 2ª dai gironi) ──
   if (gc) {
@@ -883,11 +877,11 @@ function getKnockoutCalendarSlots() {
   return [
     // QUARTI (slot disponibili solo dopo chiusura gironi)
     { day:'Mar 23 Giugno', time:'20:45', label:'Quarto di Finale A', bracketKey:'QFA',
-      calHome: ph(bracket.QFA.home, '3ª Classificata'),
-      calAway: ph(bracket.QFA.away, '6ª Classificata') },
+      calHome: ph(bracket.QFA.home, 'Stazione'),
+      calAway: ph(bracket.QFA.away, 'San Carlo') },
     { day:'Mar 23 Giugno', time:'21:45', label:'Quarto di Finale B', bracketKey:'QFB',
-      calHome: ph(bracket.QFB.home, '4ª Classificata'),
-      calAway: ph(bracket.QFB.away, '5ª Classificata') },
+      calHome: ph(bracket.QFB.home, 'Benedetta'),
+      calAway: ph(bracket.QFB.away, 'Colombaio') },
     // SEMIFINALI: away = 2ª/1ª (dopo gironi), home = vincente quarto (match-by-match)
     { day:'Gio 25 Giugno', time:'20:45', label:'Semifinale B', bracketKey:'SFB',
       calHome: ph(bracket.SFB.home, 'Vincente Quarto B'),
