@@ -742,8 +742,8 @@ function seedBracket() {
 
   // ── SLOT DIRETTI IN SEMIFINALE (1ª e 2ª dai gironi) ──
   if (gc) {
-    bracket.SFA.away = get(1); // 2ª classificata → SFA away (vs vincente QFA)
-    bracket.SFB.away = get(0); // 1ª classificata → SFB away (vs vincente QFB)
+    bracket.SFA.away = 'Monterotondo'; // vs vincente QFA
+    bracket.SFB.away = 'Madonnina';    // vs vincente QFB
   } else {
     if (!bracket.SFA.winner) bracket.SFA.away = null;
     if (!bracket.SFB.winner) bracket.SFB.away = null;
@@ -885,10 +885,10 @@ function getKnockoutCalendarSlots() {
     // SEMIFINALI: away = 2ª/1ª (dopo gironi), home = vincente quarto (match-by-match)
     { day:'Gio 25 Giugno', time:'20:45', label:'Semifinale B', bracketKey:'SFB',
       calHome: ph(bracket.SFB.home, 'Vincente Quarto B'),
-      calAway: ph(bracket.SFB.away, '1ª Classificata') },
+      calAway: ph(bracket.SFB.away, 'Madonnina') },
     { day:'Gio 25 Giugno', time:'21:45', label:'Semifinale A', bracketKey:'SFA',
       calHome: ph(bracket.SFA.home, 'Vincente Quarto A'),
-      calAway: ph(bracket.SFA.away, '2ª Classificata') },
+      calAway: ph(bracket.SFA.away, 'Monterotondo') },
     // FINALI: compilate man mano che le semi si chiudono
     { day:'Ven 26 Giugno', time:'20:45', label:'Finale 3°/4° Posto', bracketKey:'TER',
       calHome: ph(bracket.TER.home, 'Perdente Semi A'),
